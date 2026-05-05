@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — SendCrypto.io | Crypto Remittance Guides</title>
+  <meta name="description" content="Operator-depth guides on crypto-to-fiat conversion, remittance corridors, rate comparisons. Written by practitioners." />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#050810;--bg2:#080c18;--surface:#0d1225;--border:rgba(255,255,255,0.07);--accent:#00ff88;--text:#f0f4ff;--muted:#6b7a99;--card:rgba(255,255,255,0.03)}
+    html{scroll-behavior:smooth}body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(5,8,16,.97) 0%,transparent 100%);backdrop-filter:blur(12px)}
+    .nl{font-size:1.2rem;font-weight:800;letter-spacing:-.02em;color:var(--text);text-decoration:none}.nl span{color:var(--accent)}
+    .nv{display:flex;gap:28px;list-style:none}
+    .nv a{color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+    .nv a:hover,.nv a.active{color:var(--accent)}
+    .ncta{background:var(--accent)!important;color:#050810!important;padding:10px 20px;border-radius:4px;font-weight:700!important}
+    main{position:relative;z-index:1;padding-top:100px}
+    .ph{padding:80px 40px 60px;border-bottom:1px solid var(--border)}
+    .ptag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    .ptitle{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.05}
+    .psub{margin-top:20px;font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75}
+    .fbar{padding:28px 40px;border-bottom:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .fbl{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+    .fbtn{padding:7px 16px;border-radius:100px;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+    .fbtn:hover,.fbtn.active{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:var(--accent)}
+    .blayout{display:grid;grid-template-columns:1fr 300px;gap:0}
+    .fp{padding:60px 40px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .fbadge{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+    .fcat{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+    .ftl{font-size:1.7rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:16px}
+    .ftl a{color:var(--text);text-decoration:none;transition:color .2s}.ftl a:hover{color:var(--accent)}
+    .fex{font-size:.9rem;color:var(--muted);line-height:1.75;margin-bottom:20px}
+    .pmeta{display:flex;align-items:center;gap:16px}
+    .pd,.pt{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+    .pmd{width:3px;height:3px;background:var(--muted);border-radius:50%}
+    .rbtn{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:.85rem;font-weight:700;text-decoration:none;margin-top:12px;background:none;border:none;cursor:pointer}
+    .fvis{aspect-ratio:16/10;background:var(--surface);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .vcode{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);opacity:.6;padding:24px;line-height:1.8}
+    .pgrid{padding:48px 40px;border-right:1px solid var(--border);display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+    .pcard{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card);transition:border-color .2s,transform .2s}
+    .pcard:hover{border-color:rgba(0,255,136,.2);transform:translateY(-2px)}
+    .pct{padding:28px 28px 0}
+    .pcc{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .pcti{font-size:1.05rem;font-weight:700;letter-spacing:-.02em;line-height:1.3;margin-bottom:12px}
+    .pcti a{color:var(--text);text-decoration:none;transition:color .2s}.pcti a:hover{color:var(--accent)}
+    .pce{font-size:.85rem;color:var(--muted);line-height:1.65}
+    .pcb{margin-top:auto;padding:20px 28px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .pcd,.pcr{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted)}
+    .pcr{color:var(--accent)}
+    .side{padding:60px 32px}
+    .ss{margin-bottom:48px}
+    .stl{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .snl{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:8px;padding:24px}
+    .snl h4{font-size:.95rem;font-weight:700;margin-bottom:10px}
+    .snl p{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:16px}
+    .sei{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--text);outline:none;margin-bottom:10px}
+    .sei::placeholder{color:var(--muted)}
+    .ssub{width:100%;background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;border:none;border-radius:4px;padding:10px;cursor:pointer}
+    .ssuccess{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--accent);margin-top:8px;display:none}
+    .ta{display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .ta:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .tn{font-family:'DM Mono',monospace;font-size:1.1rem;color:rgba(0,255,136,.2);font-weight:500;flex-shrink:0;width:24px}
+    .tt{font-size:.82rem;font-weight:600;line-height:1.4}
+    .tt a{color:var(--text);text-decoration:none;transition:color .2s}.tt a:hover{color:var(--accent)}
+    .tc{display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:6px 12px;border:1px solid var(--border);border-radius:100px;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;transition:all .2s}
+    .tag:hover{border-color:rgba(0,255,136,.3);color:var(--accent)}
+    .lm{padding:40px;text-align:center;border-top:1px solid var(--border);border-right:1px solid var(--border)}
+    .lmbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:.85rem;padding:12px 28px;border-radius:4px;cursor:pointer;transition:all .2s}
+    .lmbtn:hover{border-color:rgba(0,255,136,.3);color:var(--accent)}
+    footer{position:relative;z-index:1;padding:60px 40px 40px;border-top:1px solid var(--border)}
+    .fi{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+    .flogo{font-size:1.1rem;font-weight:800}.flogo span{color:var(--accent)}
+    .flinks{display:flex;gap:24px;list-style:none}
+    .flinks a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .2s}.flinks a:hover{color:var(--text)}
+    .fcopy{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)}
+    .bloading{padding:32px;text-align:center;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+    @media(max-width:1024px){.blayout{grid-template-columns:1fr}.side{border-top:1px solid var(--border)}}
+    @media(max-width:768px){nav{padding:16px 20px}.nv{display:none}.ph,.fbar{padding-left:20px;padding-right:20px}.fp{grid-template-columns:1fr;gap:32px;padding:40px 20px}.fvis{display:none}.pgrid{grid-template-columns:1fr;padding:32px 20px}.side{padding:40px 20px}footer{padding:40px 20px}}
+  
+    .cursor{position:fixed;width:12px;height:12px;background:#00ff88;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+    .cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(0,255,136,.4);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    body{cursor:none}
+  </style>
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sendcrypto.io/blog/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Crypto Remittance Intel | SendCrypto.io Blog" />
+  <meta property="og:description" content="Rate analysis, corridor guides, and sender tactics for crypto-to-fiat transfers. Updated weekly." />
+  <meta property="og:url" content="https://sendcrypto.io/blog/" />
+  <meta property="og:site_name" content="SendCrypto.io" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Crypto Remittance Intel | SendCrypto.io Blog" />
+  <meta name="twitter:description" content="Rate analysis, corridor guides, and sender tactics. Updated weekly." />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"SendCrypto.io — Crypto Remittance Intel","url":"https://sendcrypto.io/blog/","description":"Rate analysis, corridor guides, and sender tactics for crypto-to-fiat transfers.","publisher":{"@type":"Organization","name":"SendCrypto.io","url":"https://sendcrypto.io"}}</script>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+
+<nav>
+  <a href="/index.html" class="nl" style="display:flex;align-items:center;gap:10px;text-decoration:none"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect x="1" y="1" width="30" height="30" rx="6.5" stroke="#00ff88" stroke-width="1.5"/><path d="M9 20C9 20 9 16.5 16 16.5C23 16.5 23 13 16 13C9 13 9 16.5 16 16.5C23 16.5 23 20 16 20" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round"/><polyline points="14,20 19.5,20 17.5,18" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Send<span style="color:#00ff88">Crypto</span>.io</span></a>
+  <ul class="nv">
+    <li><a href="index.html#compare">Compare</a></li>
+    <li><a href="index.html#corridors">Corridors</a></li>
+    <li><a href="/blog/index.html" class="active">Blog</a></li>
+    <li><a href="/company/index.html">Company</a></li>
+    <li><a href="index.html#rates" class="ncta">Get Free Alerts</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="ph">
+    <div class="ptag">// crypto remittance intel</div>
+    <h1 class="ptitle">The Rate Bible</h1>
+    <p class="psub">Operator-depth analysis on crypto-to-fiat corridors, platform comparisons, and remittance strategy. No filler.</p>
+  </div>
+
+  <div class="fbar">
+    <span class="fbl">Filter:</span>
+    <button class="fbtn active" onclick="filterPosts('all',this)">All</button>
+    <button class="fbtn" onclick="filterPosts('rate-guide',this)">Rate Guides</button>
+    <button class="fbtn" onclick="filterPosts('corridor-report',this)">Corridor Reports</button>
+    <button class="fbtn" onclick="filterPosts('platform-review',this)">Platform Reviews</button>
+    <button class="fbtn" onclick="filterPosts('compliance',this)">Compliance</button>
+    <button class="fbtn" onclick="filterPosts('how-to',this)">How-To</button>
+  </div>
+
+  <div class="blayout">
+    <div>
+      <div class="fp">
+        <div>
+          <div class="fbadge">// Featured Guide</div>
+          <div class="fcat">Rate Guide · US → Mexico</div>
+          <h2 class="ftl"><a href="#">How to Convert Bitcoin to Cash in Texas 2026 — Best Rates, Lowest Fees</a></h2>
+          <p class="fex">Texas has more active crypto-to-cash users than any other US state. We tested every licensed platform and ranked by net amount received. The difference between best and worst rate is $1,240 per Bitcoin.</p>
+          <div class="pmeta"><span class="pd">Apr 18, 2026</span><span class="pmd"></span><span class="pt">9 min read</span></div>
+          <button class="rbtn">Read Full Guide →</button>
+        </div>
+        <div class="fvis">
+          <div class="vcode">BTC → USD (Texas, Apr 2026)<br>─────────────────────────<br>MoonPay &nbsp;&nbsp;$67,204 &nbsp;1.9% fee<br>Transak &nbsp;&nbsp;$67,180 &nbsp;2.1% fee<br>Coinbase &nbsp;$66,950 &nbsp;1.49% fee<br>─────────────────────────<br><span style="color:#00d4ff">Delta: $1,240 per BTC</span></div>
+        </div>
+      </div>
+
+      <div class="pgrid" id="postGrid">
+        <div class="bloading">// loading articles from database...</div>
+      </div>
+
+      <div class="lm"><button class="lmbtn" id="loadMoreBtn" onclick="loadMore()">Load More Articles ↓</button></div>
+    </div>
+
+    <aside class="side">
+      <div class="ss">
+        <div class="snl">
+          <h4>The Rate Bible</h4>
+          <p>Best rates for 10 corridors. Updated weekly. Free. 2,000+ subscribers.</p>
+          <input type="email" class="sei" id="sideEmail" placeholder="your@email.com" />
+          <button class="ssub" onclick="sideSubscribe()">Get Weekly Rates →</button>
+          <div class="ssuccess" id="sideOk">✓ You're subscribed.</div>
+        </div>
+      </div>
+      <div class="ss">
+        <div class="stl">Most Read This Week</div>
+        <div class="ta"><span class="tn">01</span><div class="tt"><a href="#">Bitcoin to Cash in Texas 2026 — Best Rates</a></div></div>
+        <div class="ta"><span class="tn">02</span><div class="tt"><a href="#">USDT to NGN — Nigeria Rate Comparison</a></div></div>
+        <div class="ta"><span class="tn">03</span><div class="tt"><a href="#">MoonPay vs Transak Full Comparison</a></div></div>
+        <div class="ta"><span class="tn">04</span><div class="tt"><a href="#">USDT to Pesos — MXN, COP, ARS, CLP</a></div></div>
+        <div class="ta"><span class="tn">05</span><div class="tt"><a href="#">How to Check if Your Platform is Licensed</a></div></div>
+      </div>
+      <div class="ss">
+        <div class="stl">Browse by Corridor</div>
+        <div class="tc">
+          <a href="#" class="tag" onclick="filterPosts('US-MX',null)">US → Mexico</a>
+          <a href="#" class="tag" onclick="filterPosts('US-NG',null)">US → Nigeria</a>
+          <a href="#" class="tag" onclick="filterPosts('US-PH',null)">US → Philippines</a>
+          <a href="#" class="tag" onclick="filterPosts('US-BR',null)">US → Brazil</a>
+          <a href="#" class="tag" onclick="filterPosts('US-KE',null)">US → Kenya</a>
+          <a href="#" class="tag">USDT → MXN</a>
+          <a href="#" class="tag">BTC → NGN</a>
+          <a href="#" class="tag">ETH → PHP</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="fi">
+    <div class="flogo">Send<span>Crypto</span>.io</div>
+    <ul class="flinks">
+      <li><a href="index.html#compare">Compare</a></li>
+      <li><a href="/blog/index.html">Blog</a></li>
+      <li><a href="/company/index.html">Company</a></li>
+      <li><a href="/privacy/index.html">Privacy</a></li>
+      <li><a href="/terms/index.html">Terms</a></li>
+    </ul>
+    <div class="fcopy">© 2026 SendCrypto.io — Comparison platform. Not a licensed money transmitter.</div>
+  </div>
+</footer>
+
+<script>
+const SU='https://kbilecibimkkouenojpj.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiaWxlY2liaW1ra291ZW5vanBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODQ0OTAsImV4cCI6MjA5MzA2MDQ5MH0.sDV6KM_ul6bTL--6uETWyBrSMyM3gJdccfYbuAftqFo';
+const SH={'apikey':SK,'Authorization':`Bearer ${SK}`};
+
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key))||(e.ctrlKey&&['U','S'].includes(e.key.toUpperCase())))e.preventDefault();});
+
+// STATIC FALLBACK POSTS (shown when DB is empty)
+const STATIC_POSTS=[
+  {slug:'btc-cash-texas-2026',title:'Best Crypto to Cash Apps for Mexico Remittance -- USDT, BTC & Stablecoin Comparison',category:'corridor-report',corridor_tag:'US-MX',published_at:'2026-04-12',read_min:7,excerpt:'The US-Mexico corridor moves $42B annually. We compare 8 platforms on the MXN rate, transfer speed, and payout method.'},
+  {slug:'usdt-ngn-2026',title:'Fastest Way to Send Crypto to Nigeria -- NGN Rates & Platform Comparison 2026',category:'how-to',corridor_tag:'US-NG',published_at:'2026-04-08',read_min:8,excerpt:'Nigeria is the largest crypto remittance market in Africa. USDT to NGN is the dominant route. We rank every licensed platform by net NGN received.'},
+  {slug:'usdt-pesos-2026',title:'Convert USDT to Pesos -- Best Rates Across MXN, COP, ARS, and CLP',category:'rate-guide',corridor_tag:'US-MX',published_at:'2026-03-29',read_min:6,excerpt:'Stablecoin-to-peso is the fastest growing segment in crypto remittances. Each country has different licensed providers and wildly different rates.'},
+  {slug:'moonpay-vs-transak',title:'MoonPay vs Transak for Crypto-to-Cash Withdrawals -- Full 2026 Comparison',category:'platform-review',corridor_tag:null,published_at:'2026-03-22',read_min:11,excerpt:'Both platforms dominate the on-ramp market. For cash withdrawals, the fee structures diverge significantly depending on your corridor.'},
+  {slug:'licensing-check',title:'Why Your Crypto-to-Cash Platform Needs a Money Transmitter License -- And How to Check',category:'compliance',corridor_tag:null,published_at:'2026-03-15',read_min:5,excerpt:'Sending money through an unlicensed platform can void your consumer protection rights. Here\'s how to verify any platform in 60 seconds.'},
+  {slug:'crypto-philippines-2026',title:'Crypto to Philippine Peso -- Best Rates for US-to-Philippines Remittance 2026',category:'corridor-report',corridor_tag:'US-PH',published_at:'2026-03-08',read_min:7,excerpt:'The Philippines receives $38B in annual remittances. Crypto is gaining share fast. We compare BTC and USDT-to-PHP across 6 licensed platforms.'},
+];
+
+let allPosts=[], currentFilter='all', offset=0, pageSize=6;
+
+function renderPosts(posts){
+  if(!posts.length){document.getElementById('postGrid').innerHTML='<div class="bloading">No articles found. Check back soon.</div>';return;}
+  document.getElementById('postGrid').innerHTML=posts.map(p=>{
+    const date=p.published_at?new Date(p.published_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Coming Soon';
+    const readMin=p.read_min||(p.content?Math.ceil(p.content.split(' ').length/200):6);
+    return `<div class="pcard">
+      <div class="pct">
+        <div class="pcc">${(p.category||'guide').replace('-',' ')}</div>
+        <h3 class="pcti"><a href="#">${p.title}</a></h3>
+        <p class="pce">${p.excerpt||p.meta_description||''}</p>
+      </div>
+      <div class="pcb"><span class="pcd">${date}</span><span class="pcr">${readMin} min read</span></div>
+    </div>`;
+  }).join('');
+}
+
+async function loadPosts(filter){
+  document.getElementById('postGrid').innerHTML='<div class="bloading">// loading articles...</div>';
+  try{
+    let url=`${SU}/rest/v1/blog_posts?select=slug,title,meta_description,category,corridor_tag,published_at,content&published=eq.true&order=published_at.desc&limit=${pageSize}`;
+    if(filter&&filter!=='all')url+=`&category=eq.${filter}`;
+    const r=await fetch(url,{headers:SH});
+    const data=await r.json();
+    if(!data.length)throw new Error('empty');
+    allPosts=data;renderPosts(data);
+  }catch(e){
+    // Use static fallback posts
+    let posts=STATIC_POSTS;
+    if(filter&&filter!=='all')posts=posts.filter(p=>p.category===filter||p.corridor_tag===filter);
+    renderPosts(posts);
+  }
+}
+
+function filterPosts(filter,btn){
+  currentFilter=filter;
+  if(btn){document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  loadPosts(filter);
+}
+
+async function loadMore(){
+  document.getElementById('loadMoreBtn').textContent='Loading...';
+  offset+=pageSize;
+  try{
+    const r=await fetch(`${SU}/rest/v1/blog_posts?select=slug,title,meta_description,category,corridor_tag,published_at,content&published=eq.true&order=published_at.desc&limit=${pageSize}&offset=${offset}`,{headers:SH});
+    const data=await r.json();
+    if(data.length)allPosts=[...allPosts,...data],renderPosts(allPosts);
+  }catch(e){}
+  document.getElementById('loadMoreBtn').textContent='Load More Articles v';
+}
+
+async function sideSubscribe(){
+  const email=document.getElementById('sideEmail').value.trim();
+  if(!email||!email.includes('@'))return;
+  try{
+    await fetch(`${SU}/rest/v1/subscribers`,{method:'POST',headers:{...SH,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({email,source:'blog_sidebar'})});
+    document.getElementById('sideOk').style.display='block';
+    document.getElementById('sideEmail').style.display='none';
+    document.querySelector('.ssub').style.display='none';
+  }catch(e){}
+}
+
+loadPosts('all');
+
+// CURSOR
+const C=document.getElementById('C'),CR=document.getElementById('CR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px';});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{CR.style.width='56px';CR.style.height='56px';C.style.transform='translate(-50%,-50%) scale(.5)';});
+  el.addEventListener('mouseleave',()=>{CR.style.width='36px';CR.style.height='36px';C.style.transform='translate(-50%,-50%) scale(1)';});
+});
+</script>
+</body>
+</html>

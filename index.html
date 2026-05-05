@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SendCrypto.io — Send Crypto. Get Cash. Instantly.</title>
+  <meta name="description" content="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed." />
+    <meta property="og:title" content="SendCrypto.io — Compare Crypto-to-Cash Rates Instantly" />
+  <meta property="og:description" content="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time." />
+  <meta property="og:url" content="https://sendcrypto.io/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://sendcrypto.io/og-image.png" />
+  <meta property="og:site_name" content="SendCrypto.io" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SendCrypto.io — Compare Crypto-to-Cash Rates" />
+  <meta name="twitter:description" content="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed." />
+  <meta name="twitter:image" content="https://sendcrypto.io/og-image.png" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sendcrypto.io/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io",
+    "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://sendcrypto.io/#compare",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io",
+    "logo": "https://sendcrypto.io/og-image.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "contact@sendcrypto.io",
+      "contactType": "customer service"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FinancialService",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io",
+    "description": "Cryptocurrency to fiat currency rate comparison service. Compare exchange rates across licensed platforms for US to Mexico, Nigeria, Philippines, Brazil and more remittance corridors.",
+    "serviceType": "Currency Exchange Rate Comparison",
+    "areaServed": ["US", "MX", "NG", "PH", "BR", "KE"],
+    "currenciesAccepted": "BTC, ETH, USDT"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#050810;--bg2:#080c18;--surface:#0d1225;--border:rgba(255,255,255,0.07);--accent:#00ff88;--text:#f0f4ff;--muted:#6b7a99;--card:rgba(255,255,255,0.03)}
+    html{scroll-behavior:smooth}
+    body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+    .cursor{position:fixed;width:12px;height:12px;background:#00ff88;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+    .cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(0,255,136,.4);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(5,8,16,.97) 0%,transparent 100%);backdrop-filter:blur(12px)}
+    .nav-logo{font-size:1.2rem;font-weight:800;letter-spacing:-.02em;color:var(--text);text-decoration:none}.nav-logo span{color:var(--accent)}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+    .nav-links a:hover{color:var(--accent)}
+    .nav-cta{background:var(--accent)!important;color:#050810!important;padding:10px 20px;border-radius:4px;font-weight:700!important}
+    .hero{position:relative;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:120px 40px 80px;overflow:hidden;z-index:1;gap:60px}
+    .hero-glow{position:absolute;top:-20%;left:-10%;width:70%;height:70%;background:radial-gradient(ellipse,rgba(0,255,136,.08) 0%,transparent 65%);pointer-events:none}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:100px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--accent);margin-bottom:32px;width:fit-content}
+    .hero-tag::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .hero-headline{font-size:clamp(3rem,8vw,7rem);font-weight:800;line-height:1;letter-spacing:-.04em;max-width:900px}
+    .hero-headline .g{color:var(--accent)}.hero-headline .o{-webkit-text-stroke:1px rgba(255,255,255,.3);color:transparent}
+    .hero-sub{margin-top:28px;font-size:1.1rem;color:var(--muted);max-width:520px;line-height:1.7}
+    .hero-actions{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap}
+    .btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;padding:16px 32px;border-radius:4px;text-decoration:none;border:none;cursor:none;transition:box-shadow .3s,transform .2s}
+    .btn-p:hover{box-shadow:0 0 40px rgba(0,255,136,.35);transform:translateY(-2px)}
+    .btn-s{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--text);font-family:'Syne',sans-serif;font-weight:600;font-size:.95rem;padding:16px 32px;border-radius:4px;text-decoration:none;border:1px solid var(--border);cursor:none;transition:border-color .2s}
+    .btn-s:hover{border-color:rgba(255,255,255,.2)}
+    .hero-stats{margin-top:72px;display:flex;gap:48px;flex-wrap:wrap}
+    .stat{display:flex;flex-direction:column;gap:4px}
+    .stat-v{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--accent)}
+    .stat-l{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .sdiv{width:1px;background:var(--border);align-self:stretch}
+    .ticker-wrap{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(0,255,136,.03);padding:14px 0;overflow:hidden}
+    .ticker{display:flex;animation:ticker 40s linear infinite;width:max-content}
+    .t-item{display:flex;align-items:center;gap:12px;padding:0 40px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);white-space:nowrap}
+    .t-item .up{color:var(--accent)}.t-item .dn{color:#ff4d6d}.t-item .nm{color:var(--text);font-weight:500}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .section{position:relative;z-index:1;padding:100px 40px}
+    .stag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    .stitle{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;max-width:600px}
+    .ssub{margin-top:16px;font-size:1rem;color:var(--muted);max-width:480px;line-height:1.7}
+    .cgrid{margin-top:56px;display:grid;gap:1px;background:var(--border);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .chead{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:16px 24px;background:var(--surface);font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .crow{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:18px 24px;background:var(--card);align-items:center;transition:background .2s}
+    .crow:hover{background:rgba(0,255,136,.03)}
+    .crow.best{background:rgba(0,255,136,.05);border-left:2px solid var(--accent)}
+    .pname{font-weight:700;font-size:.95rem}
+    .pbadge{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:3px;padding:2px 6px;margin-left:8px}
+    .rval{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500;color:var(--accent)}
+    .fval{font-family:'DM Mono',monospace;font-size:.85rem}
+    .sval{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted)}
+    .cbar{height:4px;background:linear-gradient(90deg,var(--accent),#00d4ff);border-radius:2px}
+    .cbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);color:var(--accent);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;padding:8px 14px;border-radius:4px;cursor:none;transition:background .2s}
+    .cbtn:hover{background:rgba(0,255,136,.18)}
+    .loading-row{padding:32px;text-align:center;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+    .corridors{position:relative;z-index:1;padding:80px 40px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .ci{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1200px;margin:0 auto}
+    .clist{margin-top:40px;display:flex;flex-direction:column;gap:12px}
+    .citem{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:none;transition:border-color .2s,transform .2s}
+    .citem:hover{border-color:rgba(0,255,136,.3);transform:translateX(4px)}
+    .croute{display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:600}
+    .crate{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent)}
+    .cvol{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+    .esec{position:relative;z-index:1;padding:100px 40px}
+    .ecard{max-width:600px;margin:0 auto;text-align:center}
+    .eform{margin-top:40px;display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface);transition:border-color .2s,box-shadow .2s}
+    .eform:focus-within{border-color:rgba(0,255,136,.4);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+    .einput{flex:1;background:transparent;border:none;outline:none;padding:16px 20px;font-family:'DM Mono',monospace;font-size:.88rem;color:var(--text)}
+    .einput::placeholder{color:var(--muted)}
+    .esubmit{background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;border:none;padding:16px 24px;cursor:none;transition:box-shadow .2s}
+    .esubmit:hover{box-shadow:0 0 20px rgba(0,255,136,.3)}
+    .epromise{margin-top:14px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+    .esuccess{margin-top:16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent);display:none}
+    .fgrid{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .fcard{padding:36px 32px;background:var(--card);transition:background .2s}
+    .fcard:hover{background:rgba(0,255,136,.03)}
+    .ficon{width:44px;height:44px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.2rem}
+    .ftitle{font-size:1rem;font-weight:700;margin-bottom:10px}
+    .fdesc{font-size:.875rem;color:var(--muted);line-height:1.65}
+    footer{position:relative;z-index:1;padding:60px 40px 40px;border-top:1px solid var(--border)}
+    .fi{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+    .flogo{font-size:1.1rem;font-weight:800}.flogo span{color:var(--accent)}
+    .flinks{display:flex;gap:24px;list-style:none}
+    .flinks a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .2s}
+    .flinks a:hover{color:var(--text)}
+    .fcopy{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)}
+    .corridor-sel .citem{border-color:rgba(0,255,136,.4)}
+
+    .hero-card{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px}
+    .hc-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .hc-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+    .hc-row.best{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.04)}
+    .hc-name{font-weight:700;font-size:.9rem}
+    .hc-badge{font-family:'DM Mono',monospace;font-size:.6rem;color:#00ff88;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);padding:2px 6px;border-radius:3px;margin-left:8px}
+    .hc-rate{font-family:'DM Mono',monospace;font-size:.95rem;color:#00ff88;font-weight:500}
+    .hc-fee{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)}
+    .hc-footer{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:center;padding-top:8px;border-top:1px solid var(--border)}
+    @media(max-width:768px){.hero{grid-template-columns:1fr}.hero-card{display:none}}
+    @media(max-width:768px){nav{padding:16px 20px}.nav-links{display:none}.hero{padding:100px 20px 60px}.hero-stats{gap:24px}.sdiv{display:none}.section{padding:60px 20px}.chead,.crow{grid-template-columns:2fr 1fr 1fr}.chead>*:nth-child(n+4),.crow>*:nth-child(n+4){display:none}.corridors{padding:60px 20px}.ci{grid-template-columns:1fr;gap:40px}.fgrid{grid-template-columns:1fr}.esec{padding:60px 20px}.eform{flex-direction:column}footer{padding:40px 20px}}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.2);border-radius:3px}
+  </style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+
+<nav>
+  <a href="/index.html" class="nav-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect x="1" y="1" width="30" height="30" rx="6.5" stroke="#00ff88" stroke-width="1.5"/><path d="M9 20C9 20 9 16.5 16 16.5C23 16.5 23 13 16 13C9 13 9 16.5 16 16.5C23 16.5 23 20 16 20" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round"/><polyline points="14,20 19.5,20 17.5,18" stroke="#00ff88" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Send<span style="color:var(--accent)">Crypto</span>.io</span></a>
+  <ul class="nav-links">
+    <li><a href="#compare">Compare</a></li>
+    <li><a href="#corridors">Corridors</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/company/">Company</a></li>
+    <li><a href="#rates" class="nav-cta">Get Free Alerts</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Live rates updated every 15 minutes</div>
+  <h1 class="hero-headline">Send Crypto.<br><span class="g">Get Cash.</span><br><span class="o">Instantly.</span></h1>
+  <p class="hero-sub">Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time.</p>
+  <div class="hero-actions">
+    <a href="#compare" class="btn-p">Compare Rates Now <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a href="#rates" class="btn-s">Get Rate Alerts</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-v">10+</div><div class="stat-l">Platforms tracked</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-v">40+</div><div class="stat-l">Corridors covered</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-v">$0</div><div class="stat-l">Cost to compare</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-v">15m</div><div class="stat-l">Rate refresh cycle</div></div>
+  </div>
+
+  <div class="hero-card">
+    <div class="hc-label">// live rates — US to Mexico · USDT/MXN</div>
+    <div class="hc-row best">
+      <div><span class="hc-name">MoonPay</span><span class="hc-badge">BEST RATE</span></div>
+      <div><div class="hc-rate">17.48 MXN</div><div class="hc-fee">1.9% fee · Instant</div></div>
+    </div>
+    <div class="hc-row">
+      <div><span class="hc-name">Transak</span></div>
+      <div><div class="hc-rate">17.31 MXN</div><div class="hc-fee">2.1% fee · ~5 min</div></div>
+    </div>
+    <div class="hc-row">
+      <div><span class="hc-name">Changelly</span></div>
+      <div><div class="hc-rate">17.18 MXN</div><div class="hc-fee">2.4% fee · ~10 min</div></div>
+    </div>
+    <div class="hc-row">
+      <div><span class="hc-name">Kraken</span></div>
+      <div><div class="hc-rate">17.05 MXN</div><div class="hc-fee">1.8% fee · ~15 min</div></div>
+    </div>
+    <div class="hc-footer">Rates refresh every 15 minutes · Updated just now</div>
+  </div>
+</section>
+
+<div class="ticker-wrap"><div class="ticker" id="TK"><div class="t-item"><span class="nm">Loading live prices...</span></div></div></div>
+
+<section class="section" id="compare">
+  <div class="stag">// live comparison</div>
+  <h2 class="stitle">Best Rates Right Now</h2>
+  <p class="ssub" id="rMeta">BTC → USD · Loading live data...</p>
+  <div class="cgrid">
+    <div class="chead"><span>Platform</span><span>Rate</span><span>Fee</span><span>Speed</span><span>Score</span><span></span></div>
+    <div id="rBody"><div class="loading-row">// fetching live rates from licensed platforms...</div></div>
+  </div>
+  <div class="fgrid" style="margin-top:48px">
+    <div class="fcard"><div class="ficon">⚡</div><div class="ftitle">Real-Time Rates</div><div class="fdesc">Every platform refreshed every 15 minutes. No cached data. No stale quotes.</div></div>
+    <div class="fcard"><div class="ficon">🔒</div><div class="ftitle">Licensed Only</div><div class="fdesc">We only list regulated, licensed providers. Your funds go to compliant platforms.</div></div>
+    <div class="fcard"><div class="ficon">🌍</div><div class="ftitle">40+ Corridors</div><div class="fdesc">US, Mexico, Nigeria, Philippines, Brazil, Kenya and growing every month.</div></div>
+  </div>
+</section>
+
+<section class="corridors" id="corridors">
+  <div class="ci">
+    <div>
+      <div class="stag">// top corridors</div>
+      <h2 class="stitle">Where Money Moves</h2>
+      <p class="ssub">The highest-volume crypto remittance corridors. Click any route to see live rates.</p>
+    </div>
+    <div class="clist">
+      <div class="citem" onclick="filterRates('US-MX','USDT','MXN',this)">
+        <div class="croute"><span>🇺🇸</span><span>United States</span><span style="color:var(--muted)">→</span><span>🇲🇽</span><span>Mexico</span></div>
+        <div><div class="crate">Best: 1.8% fee</div><div class="cvol">$42M/mo volume</div></div>
+      </div>
+      <div class="citem" onclick="filterRates('US-NG','USDT','NGN',this)">
+        <div class="croute"><span>🇺🇸</span><span>United States</span><span style="color:var(--muted)">→</span><span>🇳🇬</span><span>Nigeria</span></div>
+        <div><div class="crate">Best: 2.1% fee</div><div class="cvol">$38M/mo volume</div></div>
+      </div>
+      <div class="citem" onclick="filterRates('US-PH','USDT','PHP',this)">
+        <div class="croute"><span>🇺🇸</span><span>United States</span><span style="color:var(--muted)">→</span><span>🇵🇭</span><span>Philippines</span></div>
+        <div><div class="crate">Best: 2.0% fee</div><div class="cvol">$29M/mo volume</div></div>
+      </div>
+      <div class="citem" onclick="filterRates('US-BR','USDT','BRL',this)">
+        <div class="croute"><span>🇺🇸</span><span>United States</span><span style="color:var(--muted)">→</span><span>🇧🇷</span><span>Brazil</span></div>
+        <div><div class="crate">Best: 1.8% fee</div><div class="cvol">$21M/mo volume</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="esec" id="rates">
+  <div class="ecard">
+    <div class="stag">// free weekly intel</div>
+    <h2 class="stitle" style="max-width:100%">The Crypto Remittance Rate Bible</h2>
+    <p class="ssub" style="margin:16px auto 0;text-align:center">Best rates for 10 corridors — updated weekly. Free. 2,000+ senders.</p>
+    <div class="eform" id="eForm">
+      <input type="email" class="einput" id="eIn" placeholder="your@email.com" />
+      <button class="esubmit" id="eSub" onclick="subEmail()">Get Free Rates →</button>
+    </div>
+    <div class="epromise">Zero spam. Unsubscribe any time.</div>
+    <div class="esuccess" id="eOk">✓ You're in. First edition within 24 hours.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="fi">
+    <div class="flogo">Send<span>Crypto</span>.io</div>
+    <ul class="flinks">
+      <li><a href="#compare">Compare</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/company/">Company</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="/terms/">Terms</a></li>
+    </ul>
+    <div class="fcopy">© 2026 SendCrypto.io — Comparison platform. Not a licensed money transmitter.</div>
+  </div>
+</footer>
+
+<script>
+const SU='https://kbilecibimkkouenojpj.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiaWxlY2liaW1ra291ZW5vanBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODQ0OTAsImV4cCI6MjA5MzA2MDQ5MH0.sDV6KM_ul6bTL--6uETWyBrSMyM3gJdccfYbuAftqFo';
+const AFN=`${SU}/functions/v1/affiliate-redirect`;
+const SH={'apikey':SK,'Authorization':`Bearer ${SK}`};
+
+// SOURCE PROTECTION
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key))||(e.ctrlKey&&['U','S'].includes(e.key.toUpperCase())))e.preventDefault();
+});
+
+// CURSOR
+const C=document.getElementById('C'),CR=document.getElementById('CR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px';});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button,.citem').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{CR.style.width='56px';CR.style.height='56px';C.style.transform='translate(-50%,-50%) scale(.5)';});
+  el.addEventListener('mouseleave',()=>{CR.style.width='36px';CR.style.height='36px';C.style.transform='translate(-50%,-50%) scale(1)';});
+});
+
+// TICKER
+async function loadTicker(){
+  try{
+    const r=await fetch(`${SU}/rest/v1/coingecko_prices?select=symbol,price,price_change_24h&order=fetched_at.desc&limit=4`,{headers:SH});
+    const d=await r.json();
+    if(!d.length)return;
+    const base=d.map(c=>{
+      const up=c.price_change_24h>=0;
+      const pct=Math.abs(c.price_change_24h||0).toFixed(2);
+      const price=c.price>=1000?`$${Number(c.price).toLocaleString()}`:`$${Number(c.price).toFixed(4)}`;
+      return `<div class="t-item"><span class="nm">${c.symbol}/USD</span> <span class="${up?'up':'dn'}">${price} ${up?'↑':'↓'}${pct}%</span></div>`;
+    }).join('');
+    const extra=[
+      '<div class="t-item"><span class="nm">USDT/MXN</span> <span class="up">17.42 ↑0.1%</span></div>',
+      '<div class="t-item"><span class="nm">USDT/NGN</span> <span class="up">1,612 ↑0.4%</span></div>',
+      '<div class="t-item"><span class="nm">BTC/PHP</span> <span class="up">₱3.84M ↑1.1%</span></div>',
+      '<div class="t-item"><span class="nm">ETH/BRL</span> <span class="up">R$17,890 ↑0.6%</span></div>',
+    ].join('');
+    const all=base+extra;
+    document.getElementById('TK').innerHTML=all+all;
+  }catch(e){console.warn(e);}
+}
+loadTicker();
+setInterval(loadTicker,900000); // refresh ticker every 15 min
+
+// RATES TABLE
+let curC='US-MX',curA='BTC',curCur='USD';
+async function loadRates(corridor,asset,currency){
+  curC=corridor||'US-MX';curA=asset||'BTC';curCur=currency||'USD';
+  document.getElementById('rBody').innerHTML='<div class="loading-row">// fetching live rates...</div>';
+  document.getElementById('rMeta').textContent=`${curA} → ${curCur} · Updated just now`;
+  try{
+    const r=await fetch(
+      `${SU}/rest/v1/rates?select=rate,fee_pct,speed_minutes,providers(name,slug)&corridor=eq.${curC}&from_asset=eq.${curA}&to_currency=eq.${curCur}&order=rate.desc&limit=6`,
+      {headers:SH}
+    );
+    const rows=await r.json();
+    if(!rows.length){document.getElementById('rBody').innerHTML='<div class="loading-row">No rates for this corridor yet — check back soon.</div>';return;}
+    const maxR=rows[0].rate;
+    document.getElementById('rBody').innerHTML=rows.map((r,i)=>{
+      const p=r.providers||{};
+      const score=Math.round((r.rate/maxR)*52);
+      const isBest=i===0;
+      const rd=curCur==='USD'?`$${Number(r.rate).toLocaleString()}`:`${Number(r.rate).toLocaleString()} ${curCur}`;
+      const spd=r.speed_minutes<=1?'Instant':r.speed_minutes<=10?`~${r.speed_minutes} min`:`~${r.speed_minutes} min`;
+      return `<div class="crow${isBest?' best':''}">
+        <div class="pname">${p.name||'Provider'}${isBest?' <span class="pbadge">BEST RATE</span>':''}</div>
+        <div class="rval">${rd}</div>
+        <div class="fval">${r.fee_pct}%</div>
+        <div class="sval">${spd}</div>
+        <div><div class="cbar" style="width:${score}px"></div></div>
+        <button class="cbtn" onclick="go('${p.slug||''}','${curC}','${curA}')">Convert →</button>
+      </div>`;
+    }).join('');
+  }catch(e){document.getElementById('rBody').innerHTML='<div class="loading-row">// error loading rates. refresh to retry.</div>';}
+}
+
+function filterRates(corridor,asset,currency,el){
+  document.querySelectorAll('.citem').forEach(x=>x.style.borderColor='');
+  if(el)el.style.borderColor='rgba(0,255,136,.5)';
+  window.location.href='#compare';
+  loadRates(corridor,asset,currency);
+}
+
+// AFFILIATE REDIRECT — real URL never exposed in browser
+function go(slug,corridor,asset){
+  if(!slug)return;
+  const sid=Math.random().toString(36).substr(2,9);
+  window.open(`${AFN}?p=${slug}&c=${corridor}&a=${asset}&s=${sid}`,'_blank','noopener');
+}
+
+// EMAIL SUBSCRIBE
+async function subEmail(){
+  const inp=document.getElementById('eIn');
+  const btn=document.getElementById('eSub');
+  const email=inp.value.trim();
+  if(!email||!email.includes('@')){inp.style.outline='1px solid #ff4d6d';return;}
+  btn.textContent='Subscribing...';btn.disabled=true;
+  try{
+    await fetch(`${SU}/rest/v1/subscribers`,{
+      method:'POST',
+      headers:{...SH,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({email,source:'hero_form',asset:curA,corridor:curC})
+    });
+    document.getElementById('eForm').style.display='none';
+    document.getElementById('eOk').style.display='block';
+  }catch(e){btn.textContent='Get Free Rates →';btn.disabled=false;}
+}
+
+// INIT
+loadRates('US-MX','USDT','MXN');
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}}),{threshold:.1});
+document.querySelectorAll('.crow,.fcard,.citem').forEach(el=>{
+  el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity .5s ease,transform .5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
