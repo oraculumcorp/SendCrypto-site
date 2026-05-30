@@ -10,13 +10,7 @@ const { data: prices } = await supabase.from('coingecko_prices').select('symbol,
 const safeRates = rates || [];
 const safePrices = prices || [];
 const maxRate = safeRates[0]?.rate || 0;
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "SendCrypto.io",
-  "url": "https://sendcrypto.io",
-  "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms.",
-};
+const jsonLd = { "@context": "https://schema.org", "@type": "WebSite", "name": "SendCrypto.io", "url": "https://sendcrypto.io", "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms." };
 ---
 <BaseLayout title="SendCrypto.io — Send Crypto. Get Cash. Instantly." description="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time." jsonLd={jsonLd}>
   <Nav slot="nav" />
@@ -51,12 +45,16 @@ const jsonLd = {
           <div class="rc-live"><span class="live-dot"></span>Live</div>
         </div>
         <div class="rate-rows">
-          {safeRates.slice(0, 4).map((r: any, i: number) => (
-            <div class={`rate-row ${i === 0 ? 'rate-row--best' : ''}`}>
-              <div class="rr-left">{i === 0 && <span class="best-crown">👑</span>}<span class="rr-name">{r.providers?.name || 'Provider'}</span>{i === 0 && <span class="best-tag">Best Rate</span>}</div>
-              <div class="rr-right"><span class="rr-rate">{Number(r.rate).toLocaleString()} MXN</span><span class="rr-fee">{r.fee_pct}% · {r.speed_minutes <= 1 ? 'Instant' : `~${r.speed_minutes}m`}</span></div>
-            </div>
-          ))}
+          {safeRates.slice(0, 4).map((r: any, i: number) => {
+            const rowClass = i === 0 ? 'rate-row rate-row--best' : 'rate-row';
+            const speed = r.speed_minutes <= 1 ? 'Instant' : ('~' + r.speed_minutes + 'm');
+            return (
+              <div class={rowClass}>
+                <div class="rr-left">{i === 0 && <span class="best-crown">👑</span>}<span class="rr-name">{r.providers?.name || 'Provider'}</span>{i === 0 && <span class="best-tag">Best Rate</span>}</div>
+                <div class="rr-right"><span class="rr-rate">{Number(r.rate).toLocaleString()} MXN</span><span class="rr-fee">{r.fee_pct}% · {speed}</span></div>
+              </div>
+            );
+          })}
           {safeRates.length === 0 && <div class="rc-loading">Loading live rates…</div>}
         </div>
         <div class="rate-card-footer">Refreshes every 15 minutes · <a href="#compare">See all →</a></div>
@@ -86,14 +84,16 @@ const jsonLd = {
       <div class="ct-head"><span>Platform</span><span>Rate</span><span>Fee</span><span>Speed</span><span>Score</span><span></span></div>
       {safeRates.map((r: any, i: number) => {
         const score = Math.round((r.rate / maxRate) * 100);
-        const speed = r.speed_minutes <= 1 ? 'Instant' : `~${r.speed_minutes} min`;
+        const speed = r.speed_minutes <= 1 ? 'Instant' : ('~' + r.speed_minutes + ' min');
+        const rowCls = i === 0 ? 'ct-row ct-row--best' : 'ct-row';
+        const scoreStyle = 'width:' + score + '%';
         return (
-          <div class={`ct-row ${i === 0 ? 'ct-row--best' : ''}`}>
+          <div class={rowCls}>
             <div class="ct-platform">{i === 0 && <span class="ct-crown">👑</span>}<span class="ct-name">{r.providers?.name || 'Provider'}</span>{i === 0 && <span class="ct-badge">Best</span>}</div>
             <div class="ct-rate">{Number(r.rate).toLocaleString()}<span class="ct-curr"> MXN</span></div>
             <div class="ct-fee">{r.fee_pct}%</div>
             <div class="ct-speed">{speed}</div>
-            <div class="ct-score"><div class="score-bar"><div class="score-fill" style={`width:${score}%`}></div></div></div>
+            <div class="ct-score"><div class="score-bar"><div class="score-fill" style={scoreStyle}></div></div></div>
             <button class="ct-btn" data-provider={r.providers?.slug} data-corridor="US-MX" data-asset="USDT">Convert →</button>
           </div>
         );
