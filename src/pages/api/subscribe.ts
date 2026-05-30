@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getServiceClient } from '../../lib/supabase';
-import { isValidEmail, anonymizeIp, checkRateLimit } from '../../lib/security';
+import { isValidEmail, anonymizeIp } from '../../lib/security';
 
 export const prerender = false;
 
@@ -18,10 +18,8 @@ export const OPTIONS: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
-  const env = (locals as any).runtime?.env || import.meta.env;
   const origin = request.headers.get('origin');
 
-  // CORS check — block requests from other origins
   if (origin && !ALLOWED_ORIGINS.includes(origin)) {
     return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
       status: 403,
@@ -29,42 +27,59 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     });
   }
 
+  // Get env from Cloudflare runtime
+  const runtime = (locals as any).runtime;
+  const env = runtime?.env ?? {};
+
+  // Pull keys explicitly — Cloudflare secrets are on env directly
+  const supabaseUrl = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    return new Response(JSON.stringify({
+      error: 'Server configuration error',
+      debug: {
+        hasUrl: !!supabaseUrl,
+        hasKey: !!serviceKey,
+        envKeys: Object.keys(env),
+      }
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  let body: any;
   try {
-    const body = await request.json();
-    const { email, source, consent_copy, consent_timestamp } = body;
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-    // Email validation
-    if (!email || !isValidEmail(email)) {
-      return new Response(JSON.stringify({ error: 'Invalid email address' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  const { email, source, consent_copy, consent_timestamp } = body;
 
-    // Consent required
-    if (!consent_copy || !consent_timestamp) {
-      return new Response(JSON.stringify({ error: 'Consent required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  if (!email || !isValidEmail(email)) {
+    return new Response(JSON.stringify({ error: 'Invalid email address' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-    // Rate limit: 3 subscriptions per IP per hour
-    const ipKey = `subscribe:${clientAddress}`;
-    const kv = env.RATE_LIMIT_KV;
-    const rateCheck = await checkRateLimit(ipKey, 3, 3600, kv);
-    if (!rateCheck.allowed) {
-      return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  if (!consent_copy || !consent_timestamp) {
+    return new Response(JSON.stringify({ error: 'Consent required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
+  try {
     const supabase = getServiceClient(env);
     const anonIp = anonymizeIp(clientAddress || '');
 
-    // Insert subscriber with full GDPR audit trail
-    const { error } = await supabase.from('subscribers').upsert(
+    const { error: dbError } = await supabase.from('subscribers').upsert(
       {
         email: email.toLowerCase().trim(),
         source: source || 'unknown',
@@ -77,32 +92,37 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
       { onConflict: 'email' }
     );
 
-    if (error) {
-      console.error('Subscribe error:', error);
-      return new Response(JSON.stringify({ error: 'Subscription failed' }), {
+    if (dbError) {
+      return new Response(JSON.stringify({
+        error: 'Database error',
+        detail: dbError.message,
+      }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // Log to audit table (immutable record)
-    await supabase.from('audit_log').insert({
-      action: 'subscribe_attempt',
+    // Fire and forget audit log
+    supabase.from('audit_log').insert({
+      action: 'subscribe',
       session_id: 'system',
       context: { source, ip_anon: anonIp },
       timestamp: new Date().toISOString(),
-    }).select().single().then(() => {}, () => {});
+    }).then(() => {}, () => {});
 
-    return new Response(JSON.stringify({ success: true, message: 'Confirmation email sent' }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': origin || ALLOWED_ORIGINS[0],
       },
     });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'Invalid request' }), {
-      status: 400,
+  } catch (err: any) {
+    return new Response(JSON.stringify({
+      error: 'Unexpected error',
+      detail: err?.message || String(err),
+    }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   }
