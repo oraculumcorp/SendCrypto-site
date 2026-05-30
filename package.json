@@ -17,6 +17,7 @@
     "isomorphic-dompurify": "^2.16.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "wrangler": "^4.95.0"
   }
 }
