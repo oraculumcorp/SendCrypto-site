@@ -25,6 +25,37 @@ const safeRates = rates || [];
 const safePrices = prices || [];
 const maxRate = safeRates[0]?.rate || 0;
 
+// Pre-compute all row data to avoid ternary expressions inside JSX template
+const rateRows = safeRates.map((r: any, i: number) => ({
+  name: r.providers?.name || "Provider",
+  slug: r.providers?.slug || "",
+  rate: Number(r.rate).toLocaleString(),
+  fee: r.fee_pct,
+  speed: r.speed_minutes <= 1 ? "Instant" : ("~" + r.speed_minutes + " min"),
+  rowCls: i === 0 ? "ct-row ct-row--best" : "ct-row",
+  scoreStyle: "width:" + Math.round((r.rate / (safeRates[0]?.rate || 1)) * 100) + "%",
+  isBest: i === 0,
+}));
+
+const heroRows = safeRates.slice(0, 4).map((r: any, i: number) => ({
+  name: r.providers?.name || "Provider",
+  rate: Number(r.rate).toLocaleString(),
+  fee: r.fee_pct,
+  speed: r.speed_minutes <= 1 ? "Instant" : ("~" + r.speed_minutes + "m"),
+  rowCls: i === 0 ? "rate-row rate-row--best" : "rate-row",
+  isBest: i === 0,
+}));
+
+const tickerItems = [...(prices || []), ...(prices || [])].map((c: any) => ({
+  sym: c.symbol,
+  price: c.price >= 1000 ? ("$" + Number(c.price).toLocaleString()) : ("$" + Number(c.price).toFixed(4)),
+  pct: Math.abs(c.price_change_24h || 0).toFixed(2),
+  up: (c.price_change_24h || 0) >= 0,
+  valCls: (c.price_change_24h || 0) >= 0 ? "tick-val up" : "tick-val dn",
+  chgCls: (c.price_change_24h || 0) >= 0 ? "tick-chg up" : "tick-chg dn",
+  arrow: (c.price_change_24h || 0) >= 0 ? "+" : "-",
+}));
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -102,23 +133,19 @@ const jsonLd = {
           </div>
         </div>
         <div class="rate-rows">
-          {safeRates.slice(0, 4).map((r: any, i: number) => {
-            const rowClass = i === 0 ? "rate-row rate-row--best" : "rate-row";
-            const rspeed = r.speed_minutes <= 1 ? "Instant" : ("~" + r.speed_minutes + "m");
-            return (
-              <div class={rowClass}>
-                <div class="rr-left">
-                  {i === 0 && <span class="best-tag">Best</span>}
-                  <span class="rr-name">{r.providers?.name || "Provider"}</span>
-                </div>
-                <div class="rr-right">
-                  <span class="rr-rate">{Number(r.rate).toLocaleString()} MXN</span>
-                  <span class="rr-fee">{r.fee_pct}% &middot; {rspeed}</span>
-                </div>
+          {heroRows.map((r) => (
+            <div class={r.rowCls}>
+              <div class="rr-left">
+                {r.isBest && <span class="best-tag">Best</span>}
+                <span class="rr-name">{r.name}</span>
               </div>
-            );
-          })}
-          {safeRates.length === 0 && <div class="rc-loading">Loading live rates...</div>}
+              <div class="rr-right">
+                <span class="rr-rate">{r.rate} MXN</span>
+                <span class="rr-fee">{r.fee}% &middot; {r.speed}</span>
+              </div>
+            </div>
+          ))}
+          {heroRows.length === 0 && <div class="rc-loading">Loading live rates...</div>}
         </div>
         <div class="rate-card-footer">
           Refreshes every 15 minutes &middot; <a href="#compare">See all platforms</a>
@@ -132,24 +159,16 @@ const jsonLd = {
     </div>
   </section>
 
-  {safePrices.length > 0 && (
+  {tickerItems.length > 0 && (
     <div class="ticker-belt">
       <div class="ticker-inner">
-        {[...safePrices, ...safePrices].map((c: any) => {
-          const up = (c.price_change_24h || 0) >= 0;
-          const pct = Math.abs(c.price_change_24h || 0).toFixed(2);
-          const cprice = c.price >= 1000 ? ("\$" + Number(c.price).toLocaleString()) : ("\$" + Number(c.price).toFixed(4));
-          const chgClass = up ? "tick-chg up" : "tick-chg dn";
-          const valClass = up ? "tick-val up" : "tick-val dn";
-          const arrow = up ? "+" : "-";
-          return (
-            <div class="tick-item">
-              <span class="tick-sym">{c.symbol}/USD</span>
-              <span class={valClass}>{cprice}</span>
-              <span class={chgClass}>{arrow}{pct}%</span>
-            </div>
-          );
-        })}
+        {tickerItems.map((c) => (
+          <div class="tick-item">
+            <span class="tick-sym">{c.sym}/USD</span>
+            <span class={c.valCls}>{c.price}</span>
+            <span class={c.chgCls}>{c.arrow}{c.pct}%</span>
+          </div>
+        ))}
       </div>
     </div>
   )}
@@ -168,34 +187,28 @@ const jsonLd = {
         <span>Score</span>
         <span></span>
       </div>
-      {safeRates.map((r: any, i: number) => {
-        const score = Math.round((r.rate / maxRate) * 100);
-        const tspeed = r.speed_minutes <= 1 ? "Instant" : ("~" + r.speed_minutes + " min");
-        const rowCls = i === 0 ? "ct-row ct-row--best" : "ct-row";
-        const scoreStyle = "width:" + score + "%";
-        return (
-          <div class={rowCls}>
-            <div class="ct-platform">
-              {i === 0 && <span class="ct-badge">Best</span>}
-              <span class="ct-name">{r.providers?.name || "Provider"}</span>
-            </div>
-            <div class="ct-rate">
-              {Number(r.rate).toLocaleString()}
-              <span class="ct-curr"> MXN</span>
-            </div>
-            <div class="ct-fee">{r.fee_pct}%</div>
-            <div class="ct-speed">{tspeed}</div>
-            <div class="ct-score">
-              <div class="score-bar">
-                <div class="score-fill" style={scoreStyle}></div>
-              </div>
-            </div>
-            <button class="ct-btn" data-provider={r.providers?.slug} data-corridor="US-MX" data-asset="USDT">
-              Convert
-            </button>
+      {rateRows.map((r) => (
+        <div class={r.rowCls}>
+          <div class="ct-platform">
+            {r.isBest && <span class="ct-badge">Best</span>}
+            <span class="ct-name">{r.name}</span>
           </div>
-        );
-      })}
+          <div class="ct-rate">
+            {r.rate}
+            <span class="ct-curr"> MXN</span>
+          </div>
+          <div class="ct-fee">{r.fee}%</div>
+          <div class="ct-speed">{r.speed}</div>
+          <div class="ct-score">
+            <div class="score-bar">
+              <div class="score-fill" style={r.scoreStyle}></div>
+            </div>
+          </div>
+          <button class="ct-btn" data-provider={r.slug} data-corridor="US-MX" data-asset="USDT">
+            Convert
+          </button>
+        </div>
+      ))}
       {safeRates.length === 0 && (
         <div class="ct-empty">Loading live rates &mdash; refresh in a moment.</div>
       )}
