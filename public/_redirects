@@ -1,7 +1,3 @@
-# Force HTTPS apex
-http://www.sendcrypto.io/* https://sendcrypto.io/:splat 301
-https://www.sendcrypto.io/* https://sendcrypto.io/:splat 301
-http://sendcrypto.io/* https://sendcrypto.io/:splat 301
 
 # Kill legacy /index.html URLs
 /index.html / 301
