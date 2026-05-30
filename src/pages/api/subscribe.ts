@@ -29,6 +29,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
   const runtime = (locals as any).runtime;
   const env = runtime?.env ?? {};
+  console.log('ENV KEYS:', Object.keys(env));
 
   const supabaseUrl = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -105,14 +106,14 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     if (resendKey) {
       const confirmUrl = `https://sendcrypto.io/api/confirm?token=${confirmToken}`;
 
-      await fetch('https://api.resend.com/emails', {
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${resendKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'The Rate Bible <hello@sendcrypto.io>',
+          from: 'The Rate Bible <contact@sendcrypto.io>',
           to: [email.toLowerCase().trim()],
           subject: 'Confirm your Rate Bible subscription',
           html: `
@@ -146,6 +147,9 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 </html>`,
         }),
       });
+      
+      const resendText = await resendRes.text();
+      console.log('Resend response:', resendRes.status, resendText);
     }
 
     // Fire and forget audit log
