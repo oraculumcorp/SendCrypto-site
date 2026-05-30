@@ -1,0 +1,46 @@
+---
+import { getPublicClient } from '../lib/supabase';
+
+export const prerender = false;
+
+const supabase = getPublicClient(Astro.locals.runtime?.env || import.meta.env);
+
+const { data: posts } = await supabase
+  .from('blog_posts')
+  .select('slug, updated_at')
+  .eq('published', true)
+  .order('published_at', { ascending: false });
+
+const staticPages = [
+  { url: '/', priority: '1.0', changefreq: 'daily' },
+  { url: '/blog/', priority: '0.9', changefreq: 'weekly' },
+  { url: '/company/', priority: '0.6', changefreq: 'monthly' },
+  { url: '/partners/', priority: '0.5', changefreq: 'monthly' },
+  { url: '/privacy/', priority: '0.3', changefreq: 'yearly' },
+  { url: '/terms/', priority: '0.3', changefreq: 'yearly' },
+  { url: '/cookies/', priority: '0.3', changefreq: 'yearly' },
+];
+
+const blogUrls = (posts || []).map((p: any) => ({
+  url: `/blog/${p.slug}/`,
+  priority: '0.8',
+  changefreq: 'monthly',
+  lastmod: p.updated_at,
+}));
+
+const allUrls = [...staticPages, ...blogUrls];
+
+Astro.response.headers.set('Content-Type', 'application/xml');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600');
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+{allUrls.map((u: any) => (
+  <url>
+    <loc>{`https://sendcrypto.io${u.url}`}</loc>
+    <changefreq>{u.changefreq}</changefreq>
+    <priority>{u.priority}</priority>
+    {u.lastmod && <lastmod>{new Date(u.lastmod).toISOString()}</lastmod>}
+  </url>
+))}
+</urlset>

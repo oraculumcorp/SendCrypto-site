@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { getPublicClient } from '../../lib/supabase';
+import { sanitizeHtml } from '../../lib/security';
+
+const { slug } = Astro.params;
+
+if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+  return Astro.redirect('/blog/');
+}
+
+const supabase = getPublicClient(Astro.locals.runtime?.env || import.meta.env);
+
+const { data: post, error } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .eq('slug', slug)
+  .eq('published', true)
+  .maybeSingle();
+
+if (!post || error) {
+  return new Response('Article not found', { status: 404 });
+}
+
+// Get related posts (same category, exclude current)
+const { data: related } = await supabase
+  .from('blog_posts')
+  .select('slug, title, category, meta_description, published_at')
+  .eq('published', true)
+  .eq('category', post.category)
+  .neq('slug', slug)
+  .order('published_at', { ascending: false })
+  .limit(3);
+
+// Sanitize the content before rendering
+const safeContent = sanitizeHtml(post.content);
+
+// Convert plain text paragraphs to HTML if content doesn't have HTML tags
+const renderedContent = safeContent.includes('<p>') || safeContent.includes('<h2>')
+  ? safeContent
+  : safeContent
+      .split('\n\n')
+      .filter((p: string) => p.trim())
+      .map((p: string) => {
+        // Detect headings (lines starting with capital, no period)
+        if (p.length < 100 && !p.includes('.') && p.match(/^[A-Z]/)) {
+          return `<h2>${p.trim()}</h2>`;
+        }
+        // Detect markdown headings
+        if (p.startsWith('## ')) return `<h2>${p.slice(3)}</h2>`;
+        if (p.startsWith('### ')) return `<h3>${p.slice(4)}</h3>`;
+        return `<p>${p.trim().replace(/\n/g, '<br/>')}</p>`;
+      })
+      .join('\n');
+
+const wordCount = post.content?.split(/\s+/).length || 0;
+const readMinutes = Math.max(3, Math.ceil(wordCount / 220));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.title,
+  "description": post.meta_description,
+  "url": `https://sendcrypto.io/blog/${post.slug}/`,
+  "datePublished": post.published_at,
+  "dateModified": post.updated_at || post.published_at,
+  "author": {
+    "@type": "Organization",
+    "name": post.author || "SendCrypto.io"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://sendcrypto.io/og-image.png"
+    }
+  },
+  "articleSection": post.category,
+  "wordCount": wordCount,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://sendcrypto.io/blog/${post.slug}/`
+  }
+};
+---
+<BaseLayout
+  title={`${post.title} | SendCrypto.io`}
+  description={post.meta_description}
+  jsonLd={jsonLd}
+  ogType="article"
+  publishedTime={post.published_at}
+  modifiedTime={post.updated_at || post.published_at}
+  canonical={`https://sendcrypto.io/blog/${post.slug}/`}
+>
+  <Nav slot="nav" active="blog" />
+
+  <article>
+    <a href="/blog/" class="back">← Back to Blog</a>
+    <div class="atag">// {(post.category || 'guide').replace('-', ' ')}{post.corridor_tag && ` · ${post.corridor_tag}`}</div>
+    <h1>{post.title}</h1>
+    <div class="ameta">
+      <span>{new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      <span>{readMinutes} min read</span>
+      <span>By {post.author || 'SendCrypto Editorial'}</span>
+    </div>
+
+    <p class="lede">{post.meta_description}</p>
+
+    <div class="article-affiliate-notice">
+      <strong>Affiliate disclosure:</strong> SendCrypto.io may earn commissions when you click through to providers featured in this article. This does not affect our rankings — rankings are based on net amount received by the sender. <a href="/company/">Full disclosure →</a>
+    </div>
+
+    <div class="content" set:html={renderedContent} />
+
+    <div class="cta-block">
+      <h3>Compare Live Rates Across Every Platform Mentioned</h3>
+      <p>Real-time rates. Free. No account needed.</p>
+      <a href="/#compare" class="cta-btn">Compare Live Rates →</a>
+    </div>
+
+    {related && related.length > 0 && (
+      <div class="related">
+        <h3>Related Articles</h3>
+        <div class="rgrid">
+          {related.map(r => (
+            <a href={`/blog/${r.slug}/`} class="rcard">
+              <div class="rcat">{(r.category || '').replace('-', ' ')}</div>
+              <div class="rtitle">{r.title}</div>
+              <div class="rdesc">{r.meta_description}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+
+  <Footer slot="footer" />
+
+  <style>
+    article{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:120px 40px 80px}
+    .back{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:40px}
+    .back:hover{text-decoration:none;opacity:.8}
+    .atag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:20px}
+    .ameta{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap}
+    .lede{font-size:1.15rem;color:rgba(240,244,255,.9);line-height:1.8;margin-bottom:24px;font-weight:400}
+    .article-affiliate-notice{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:6px;padding:14px 18px;margin-bottom:36px;font-size:.78rem;color:var(--muted);line-height:1.6}
+    .article-affiliate-notice strong{color:var(--accent);font-weight:700}
+    .article-affiliate-notice a{color:var(--accent)}
+    .content :global(h2){font-size:1.4rem;font-weight:800;letter-spacing:-.02em;color:var(--text);margin:48px 0 16px}
+    .content :global(h3){font-size:1rem;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;margin:32px 0 12px}
+    .content :global(p){color:rgba(240,244,255,.8);margin-bottom:18px;font-size:.97rem;line-height:1.82}
+    .content :global(ul),.content :global(ol){margin:0 0 18px 24px;color:rgba(240,244,255,.8);font-size:.97rem}
+    .content :global(ul li),.content :global(ol li){margin-bottom:10px;line-height:1.7}
+    .content :global(strong){color:var(--text)}
+    .content :global(a){color:var(--accent)}
+    .content :global(table){width:100%;border-collapse:collapse;margin:28px 0;font-size:.88rem}
+    .content :global(th){background:var(--surface);color:var(--accent);font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 16px;border:1px solid var(--border);text-align:left}
+    .content :global(td){padding:12px 16px;border:1px solid var(--border);color:rgba(240,244,255,.8);vertical-align:top}
+    .content :global(blockquote){border-left:3px solid var(--accent);padding:16px 24px;margin:24px 0;background:rgba(255,255,255,.02);border-radius:0 6px 6px 0;font-style:italic}
+    .cta-block{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:12px;padding:36px;margin:48px 0;text-align:center}
+    .cta-block h3{color:var(--text);font-family:'Syne',sans-serif;font-size:1.3rem;text-transform:none;letter-spacing:-.01em;margin:0 0 12px}
+    .cta-block p{color:var(--muted);margin-bottom:24px}
+    .cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:14px 28px;border-radius:4px;text-decoration:none}
+    .cta-btn:hover{text-decoration:none}
+    .related{margin-top:60px;padding-top:48px;border-top:1px solid var(--border)}
+    .related h3{font-size:1.2rem;font-weight:700;margin-bottom:24px}
+    .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .rcard{padding:20px;border:1px solid var(--border);border-radius:8px;text-decoration:none;color:inherit;transition:border-color .2s}
+    .rcard:hover{border-color:rgba(0,255,136,.3);text-decoration:none}
+    .rcat{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+    .rtitle{font-size:.95rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}
+    .rdesc{font-size:.78rem;color:var(--muted);line-height:1.5}
+    @media(max-width:768px){article{padding:100px 20px 60px}.rgrid{grid-template-columns:1fr}}
+  </style>
+</BaseLayout>

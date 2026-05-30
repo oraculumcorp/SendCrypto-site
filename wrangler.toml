@@ -1,5 +1,15 @@
 name = "sendcrypto"
-compatibility_date = "2026-05-05"
+compatibility_date = "2026-05-30"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
 
-[assets]
-directory = "."
+[vars]
+SITE_URL = "https://sendcrypto.io"
+ALLOWED_ORIGINS = "https://sendcrypto.io"
+
+# Secrets — DO NOT put these in this file
+# Set via: wrangler pages secret put SUPABASE_URL
+# Set via: wrangler pages secret put SUPABASE_ANON_KEY
+# Set via: wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY
+# Set via: wrangler pages secret put HMAC_SECRET
+# Set via: wrangler pages secret put PARTNER_API_SALT

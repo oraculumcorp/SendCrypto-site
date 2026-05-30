@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { getPublicClient } from '../../lib/supabase';
+
+const supabase = getPublicClient(Astro.locals.runtime?.env || import.meta.env);
+
+const { data: posts } = await supabase
+  .from('blog_posts')
+  .select('slug, title, meta_description, category, corridor_tag, published_at, featured')
+  .eq('published', true)
+  .order('published_at', { ascending: false })
+  .limit(20);
+
+const safePosts = posts || [];
+const featuredPost = safePosts.find(p => p.featured) || safePosts[0];
+const otherPosts = safePosts.filter(p => p.slug !== featuredPost?.slug);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "SendCrypto.io — Crypto Remittance Intel",
+  "url": "https://sendcrypto.io/blog/",
+  "description": "Rate analysis, corridor guides, and sender tactics for crypto-to-fiat transfers.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io"
+  },
+  "blogPost": safePosts.slice(0, 10).map(p => ({
+    "@type": "BlogPosting",
+    "headline": p.title,
+    "url": `https://sendcrypto.io/blog/${p.slug}/`,
+    "datePublished": p.published_at,
+    "description": p.meta_description,
+  }))
+};
+---
+<BaseLayout
+  title="Blog — SendCrypto.io | Crypto Remittance Intel"
+  description="Operator-depth guides on crypto-to-fiat conversion, remittance corridors, rate comparisons. Written by practitioners."
+  jsonLd={jsonLd}
+>
+  <Nav slot="nav" active="blog" />
+
+  <main>
+    <div class="ph">
+      <div class="ptag">// crypto remittance intel</div>
+      <h1 class="ptitle">The Rate Bible</h1>
+      <p class="psub">Operator-depth analysis on crypto-to-fiat corridors, platform comparisons, and remittance strategy. No filler.</p>
+    </div>
+
+    {featuredPost && (
+      <a href={`/blog/${featuredPost.slug}/`} class="fp-link">
+        <div class="fp">
+          <div>
+            <div class="fbadge">// Featured Guide</div>
+            <div class="fcat">{(featuredPost.category || '').replace('-', ' ')}{featuredPost.corridor_tag && ` · ${featuredPost.corridor_tag}`}</div>
+            <h2 class="ftl">{featuredPost.title}</h2>
+            <p class="fex">{featuredPost.meta_description}</p>
+            <div class="pmeta">
+              <span class="pd">{new Date(featuredPost.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
+            <span class="rbtn">Read Full Guide →</span>
+          </div>
+          <div class="fvis"></div>
+        </div>
+      </a>
+    )}
+
+    <div class="pgrid">
+      {otherPosts.map(p => (
+        <a href={`/blog/${p.slug}/`} class="pcard">
+          <div class="pct">
+            <div class="pcc">{(p.category || '').replace('-', ' ')}</div>
+            <h3 class="pcti">{p.title}</h3>
+            <p class="pce">{p.meta_description}</p>
+          </div>
+          <div class="pcb">
+            <span class="pcd">{new Date(p.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <span class="pcr">Read →</span>
+          </div>
+        </a>
+      ))}
+      {otherPosts.length === 0 && (
+        <div class="bloading">No articles yet. Check back soon.</div>
+      )}
+    </div>
+  </main>
+
+  <Footer slot="footer" />
+
+  <style>
+    main{position:relative;z-index:1;padding-top:90px;max-width:1200px;margin:0 auto}
+    .ph{padding:80px 40px 60px;border-bottom:1px solid var(--border)}
+    .ptag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    .ptitle{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.05}
+    .psub{margin-top:20px;font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75}
+    .fp-link{display:block;text-decoration:none;color:inherit}
+    .fp-link:hover{text-decoration:none}
+    .fp{padding:60px 40px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;transition:background .2s}
+    .fp:hover{background:rgba(0,255,136,.02)}
+    .fbadge{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+    .fcat{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+    .ftl{font-size:1.8rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:16px;color:var(--text)}
+    .fex{font-size:.95rem;color:var(--muted);line-height:1.75;margin-bottom:20px}
+    .pmeta{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+    .pd{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+    .rbtn{color:var(--accent);font-size:.85rem;font-weight:700}
+    .fvis{aspect-ratio:16/10;background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(0,212,255,.05));border-radius:8px;border:1px solid var(--border)}
+    .pgrid{padding:48px 40px;display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+    .pcard{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card);transition:border-color .2s,transform .2s;text-decoration:none;color:inherit}
+    .pcard:hover{border-color:rgba(0,255,136,.2);transform:translateY(-2px);text-decoration:none}
+    .pct{padding:28px 28px 0}
+    .pcc{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .pcti{font-size:1.05rem;font-weight:700;letter-spacing:-.02em;line-height:1.3;margin-bottom:12px;color:var(--text)}
+    .pce{font-size:.85rem;color:var(--muted);line-height:1.65}
+    .pcb{margin-top:auto;padding:20px 28px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .pcd,.pcr{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted)}
+    .pcr{color:var(--accent)}
+    .bloading{padding:60px;text-align:center;color:var(--muted);grid-column:span 2}
+    @media(max-width:768px){.ph,.fp,.pgrid{padding-left:20px;padding-right:20px}.fp{grid-template-columns:1fr;gap:32px;padding:40px 20px}.fvis{display:none}.pgrid{grid-template-columns:1fr}}
+  </style>
+</BaseLayout>

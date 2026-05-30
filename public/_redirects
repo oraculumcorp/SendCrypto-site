@@ -1,0 +1,22 @@
+# Force HTTPS apex
+http://www.sendcrypto.io/* https://sendcrypto.io/:splat 301
+https://www.sendcrypto.io/* https://sendcrypto.io/:splat 301
+http://sendcrypto.io/* https://sendcrypto.io/:splat 301
+
+# Kill legacy /index.html URLs
+/index.html / 301
+/blog/index.html /blog/ 301
+/company/index.html /company/ 301
+/privacy/index.html /privacy/ 301
+/terms/index.html /terms/ 301
+
+# Old static blog slugs → dynamic blog
+/blog/btc-cash-texas-2026 /blog/usdt-to-mexican-pesos-best-rates-2026 301
+/blog/usdt-ngn-nigeria-2026 /blog/usdt-to-ngn-best-rate-nigeria-2026 301
+/blog/crypto-philippines-peso-2026 /blog/best-crypto-to-cash-philippines-2026 301
+/blog/moonpay-vs-transak-2026 /blog/moonpay-vs-transak-fees-2026 301
+
+# Catch ghost URLs from previous platform
+/home-* / 301
+/_preview/* / 301
+/tmp/* / 301

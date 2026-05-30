@@ -1,0 +1,40 @@
+---
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="footer-inner">
+    <div class="fi">
+      <div class="flogo">Send<span>Crypto</span>.io</div>
+      <ul class="flinks">
+        <li><a href="/#compare">Compare</a></li>
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="/company/">Company</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+        <li><a href="/terms/">Terms</a></li>
+        <li><a href="/cookies/">Cookies</a></li>
+      </ul>
+    </div>
+    <div class="affiliate-disclosure">
+      <strong>Affiliate Disclosure:</strong> SendCrypto.io may earn affiliate commissions from licensed providers when you click through and complete transactions on their platforms. This does not increase your cost and does not influence our organic comparison rankings. Sponsored placements are clearly labeled. <a href="/company/">Read full disclosure →</a>
+    </div>
+    <div class="rate-disclaimer">
+      <strong>Rate Disclaimer:</strong> Exchange rates displayed are for comparison purposes only and are subject to change without notice. Always confirm the final rate and fees directly on the provider's platform before initiating a transfer. SendCrypto.io is a comparison and information platform — not a licensed money transmitter. We do not hold, transmit, or settle funds.
+    </div>
+    <div class="fcopy">© {year} SendCrypto.io — All rights reserved. Comparison platform. Not a licensed money transmitter.</div>
+  </div>
+</footer>
+
+<style>
+  footer{position:relative;z-index:1;padding:60px 40px 40px;border-top:1px solid var(--border);background:var(--bg2)}
+  .footer-inner{max-width:1200px;margin:0 auto}
+  .fi{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:32px}
+  .flogo{font-size:1.1rem;font-weight:800}.flogo span{color:var(--accent)}
+  .flinks{display:flex;gap:24px;list-style:none}
+  .flinks a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .2s}
+  .flinks a:hover{color:var(--text);text-decoration:none}
+  .affiliate-disclosure,.rate-disclaimer{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);line-height:1.7;padding:16px 20px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;margin-bottom:12px}
+  .affiliate-disclosure strong,.rate-disclaimer strong{color:var(--accent);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+  .affiliate-disclosure a{color:var(--accent)}
+  .fcopy{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:24px;text-align:center}
+  @media(max-width:768px){footer{padding:40px 20px}.fi{flex-direction:column;align-items:flex-start}}
+</style>

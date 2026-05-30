@@ -1,0 +1,310 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { getPublicClient } from '../lib/supabase';
+
+// Server-side fetch of live rates from Supabase
+const supabase = getPublicClient(Astro.locals.runtime?.env || import.meta.env);
+
+const { data: rates } = await supabase
+  .from('rates')
+  .select('rate, fee_pct, speed_minutes, providers(name, slug)')
+  .eq('corridor', 'US-MX')
+  .eq('from_asset', 'USDT')
+  .eq('to_currency', 'MXN')
+  .order('rate', { ascending: false })
+  .limit(6);
+
+const { data: prices } = await supabase
+  .from('coingecko_prices')
+  .select('symbol, price, price_change_24h')
+  .order('fetched_at', { ascending: false })
+  .limit(4);
+
+const safeRates = rates || [];
+const safePrices = prices || [];
+const maxRate = safeRates[0]?.rate || 0;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SendCrypto.io",
+  "url": "https://sendcrypto.io",
+  "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms.",
+};
+---
+<BaseLayout
+  title="SendCrypto.io — Send Crypto. Get Cash. Instantly."
+  description="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time."
+  jsonLd={jsonLd}
+>
+  <Nav slot="nav" />
+
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div>
+      <div class="hero-tag">Live rates updated every 15 minutes</div>
+      <h1 class="hero-headline">Send Crypto.<br /><span class="g">Get Cash.</span><br /><span class="o">Instantly.</span></h1>
+      <p class="hero-sub">Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time.</p>
+      <div class="hero-actions">
+        <a href="#compare" class="btn-p">Compare Rates Now →</a>
+        <a href="#rates" class="btn-s">Get Rate Alerts</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-v">10+</div><div class="stat-l">Platforms tracked</div></div>
+        <div class="sdiv"></div>
+        <div class="stat"><div class="stat-v">40+</div><div class="stat-l">Corridors covered</div></div>
+        <div class="sdiv"></div>
+        <div class="stat"><div class="stat-v">$0</div><div class="stat-l">Cost to compare</div></div>
+        <div class="sdiv"></div>
+        <div class="stat"><div class="stat-v">15m</div><div class="stat-l">Rate refresh</div></div>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div class="hc-label">// Live Rates — US to Mexico · USDT/MXN</div>
+      {safeRates.slice(0, 4).map((r: any, i: number) => (
+        <div class={'hc-row ' + (i === 0 ? 'best' : '')}>
+          <div>
+            <span class="hc-name">{r.providers?.name || 'Provider'}</span>
+            {i === 0 && <span class="hc-badge">BEST RATE</span>}
+          </div>
+          <div>
+            <div class="hc-rate">{Number(r.rate).toLocaleString()} MXN</div>
+            <div class="hc-fee">{r.fee_pct}% fee · {r.speed_minutes <= 1 ? 'Instant' : {'~' + r.speed_minutes + ' min'}}</div>
+          </div>
+        </div>
+      ))}
+      <div class="hc-footer">Rates refresh every 15 minutes</div>
+    </div>
+  </section>
+
+  {safePrices.length > 0 && (
+    <div class="ticker-wrap">
+      <div class="ticker">
+        {safePrices.map((c: any) => {
+          const up = (c.price_change_24h || 0) >= 0;
+          const pct = Math.abs(c.price_change_24h || 0).toFixed(2);
+          const price = c.price >= 1000 ? '$' + Number(c.price).toLocaleString() : '$' + Number(c.price).toFixed(4);
+          return (
+            <div class="t-item">
+              <span class="nm">{c.symbol}/USD</span>
+              <span class={up ? 'up' : 'dn'}>{price} {up ? '↑' : '↓'}{pct}%</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  <section class="section" id="compare">
+    <div class="stag">// live comparison</div>
+    <h2 class="stitle">Best Rates Right Now</h2>
+    <p class="ssub">USDT → MXN · Updated {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+
+    <div class="cgrid">
+      <div class="chead">
+        <span>Platform</span><span>Rate</span><span>Fee</span><span>Speed</span><span>Score</span><span></span>
+      </div>
+      {safeRates.map((r: any, i: number) => {
+        const score = Math.round((r.rate / maxRate) * 100);
+        const speed = r.speed_minutes > 1 ? ('~' + r.speed_minutes + ' min') : 'Instant';
+        return (
+          <div class={'crow ' + (i === 0 ? 'best' : '')}>
+            <div class="pname">
+              {r.providers?.name || 'Provider'}
+              {i === 0 && <span class="pbadge">BEST</span>}
+            </div>
+            <div class="rval">{Number(r.rate).toLocaleString()} MXN</div>
+            <div class="fval">{r.fee_pct}%</div>
+            <div class="sval">{speed}</div>
+            <div><div class="cbar" style={'width:' + score + '%'}></div></div>
+            <button class="cbtn" data-provider={r.providers?.slug} data-corridor="US-MX" data-asset="USDT">Convert →</button>
+          </div>
+        );
+      })}
+      {safeRates.length === 0 && (
+        <div class="loading-row">Live rate data loading. Refresh in a moment.</div>
+      )}
+    </div>
+
+    <div class="fgrid">
+      <div class="fcard"><div class="ficon">⚡</div><div class="ftitle">Real-Time Rates</div><div class="fdesc">Every platform refreshed every 15 minutes. No cached data. No stale quotes.</div></div>
+      <div class="fcard"><div class="ficon">🔒</div><div class="ftitle">Licensed Only</div><div class="fdesc">We only list regulated, licensed providers. Your funds go to compliant platforms.</div></div>
+      <div class="fcard"><div class="ficon">🌍</div><div class="ftitle">40+ Corridors</div><div class="fdesc">US, Mexico, Nigeria, Philippines, Brazil, Kenya and growing every month.</div></div>
+    </div>
+  </section>
+
+  <section class="esec" id="rates">
+    <div class="ecard">
+      <div class="stag">// free weekly intel</div>
+      <h2 class="stitle" style="max-width:100%">The Crypto Remittance Rate Bible</h2>
+      <p class="ssub" style="margin:16px auto 0;text-align:center">Best rates for 10 corridors — updated weekly. Free. 2,000+ operators already subscribed.</p>
+
+      <form id="subscribe-form" class="eform" novalidate>
+        <input type="email" name="email" class="einput" placeholder="your@email.com" required autocomplete="email" />
+        <!-- Honeypot field — invisible to humans, bots fill it -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true" />
+        <button type="submit" class="esubmit">Get Free Rates →</button>
+      </form>
+
+      <label class="consent-label">
+        <input type="checkbox" id="consent-check" required />
+        <span>I agree to receive the weekly Rate Bible newsletter and understand I can unsubscribe at any time. <a href="/privacy/">Privacy Policy</a></span>
+      </label>
+
+      <div class="epromise">Zero spam. Unsubscribe any time. Your email is encrypted at rest and never sold.</div>
+      <div class="esuccess" id="subscribe-success">✓ Check your inbox to confirm your subscription.</div>
+      <div class="eerror" id="subscribe-error"></div>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+
+  <style>
+    .hero{position:relative;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:120px 40px 80px;overflow:hidden;z-index:1;gap:60px}
+    .hero-glow{position:absolute;top:-20%;left:-10%;width:70%;height:70%;background:radial-gradient(ellipse,rgba(0,255,136,.08) 0%,transparent 65%);pointer-events:none}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:100px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--accent);margin-bottom:32px;width:fit-content}
+    .hero-tag::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .hero-headline{font-size:clamp(3rem,8vw,7rem);font-weight:800;line-height:1;letter-spacing:-.04em;max-width:900px}
+    .hero-headline .g{color:var(--accent)}
+    .hero-headline .o{-webkit-text-stroke:1px rgba(255,255,255,.3);color:transparent}
+    .hero-sub{margin-top:28px;font-size:1.1rem;color:var(--muted);max-width:520px;line-height:1.7}
+    .hero-actions{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap}
+    .btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;padding:16px 32px;border-radius:4px;text-decoration:none;transition:box-shadow .3s,transform .2s}
+    .btn-p:hover{box-shadow:0 0 40px rgba(0,255,136,.35);transform:translateY(-2px);text-decoration:none}
+    .btn-s{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--text);font-family:'Syne',sans-serif;font-weight:600;font-size:.95rem;padding:16px 32px;border-radius:4px;text-decoration:none;border:1px solid var(--border);transition:border-color .2s}
+    .btn-s:hover{border-color:rgba(255,255,255,.2);text-decoration:none}
+    .hero-stats{margin-top:72px;display:flex;gap:48px;flex-wrap:wrap}
+    .stat{display:flex;flex-direction:column;gap:4px}
+    .stat-v{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--accent)}
+    .stat-l{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .sdiv{width:1px;background:var(--border);align-self:stretch}
+    .hero-card{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:12px}
+    .hc-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+    .hc-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+    .hc-row.best{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.04)}
+    .hc-name{font-weight:700;font-size:.9rem}
+    .hc-badge{font-family:'DM Mono',monospace;font-size:.6rem;color:#00ff88;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);padding:2px 6px;border-radius:3px;margin-left:8px}
+    .hc-rate{font-family:'DM Mono',monospace;font-size:.95rem;color:#00ff88;font-weight:500}
+    .hc-fee{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)}
+    .hc-footer{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:center;padding-top:8px;border-top:1px solid var(--border)}
+    .ticker-wrap{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(0,255,136,.03);padding:14px 0;overflow:hidden}
+    .ticker{display:flex;gap:40px;animation:ticker 40s linear infinite}
+    .t-item{display:flex;align-items:center;gap:12px;padding:0 20px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);white-space:nowrap}
+    .t-item .up{color:var(--accent)}.t-item .dn{color:var(--danger)}.t-item .nm{color:var(--text);font-weight:500}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .section{position:relative;z-index:1;padding:100px 40px;max-width:1400px;margin:0 auto}
+    .stag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    .stitle{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;max-width:600px}
+    .ssub{margin-top:16px;font-size:1rem;color:var(--muted);max-width:480px;line-height:1.7}
+    .cgrid{margin-top:56px;display:grid;gap:1px;background:var(--border);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .chead{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:16px 24px;background:var(--surface);font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .crow{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:18px 24px;background:var(--card);align-items:center;transition:background .2s}
+    .crow:hover{background:rgba(0,255,136,.03)}
+    .crow.best{background:rgba(0,255,136,.05);border-left:2px solid var(--accent)}
+    .pname{font-weight:700;font-size:.95rem}
+    .pbadge{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:3px;padding:2px 6px;margin-left:8px}
+    .rval{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500;color:var(--accent)}
+    .fval,.sval{font-family:'DM Mono',monospace;font-size:.85rem}
+    .sval{color:var(--muted)}
+    .cbar{height:4px;background:linear-gradient(90deg,var(--accent),#00d4ff);border-radius:2px;max-width:100%}
+    .cbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);color:var(--accent);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;padding:8px 14px;border-radius:4px;cursor:pointer;transition:background .2s}
+    .cbtn:hover{background:rgba(0,255,136,.18)}
+    .loading-row{padding:32px;text-align:center;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+    .fgrid{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .fcard{padding:36px 32px;background:var(--card)}
+    .ficon{width:44px;height:44px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.2rem}
+    .ftitle{font-size:1rem;font-weight:700;margin-bottom:10px}
+    .fdesc{font-size:.875rem;color:var(--muted);line-height:1.65}
+    .esec{position:relative;z-index:1;padding:100px 40px}
+    .ecard{max-width:600px;margin:0 auto;text-align:center}
+    .eform{margin-top:40px;display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface);transition:border-color .2s}
+    .eform:focus-within{border-color:rgba(0,255,136,.4)}
+    .einput{flex:1;background:transparent;border:none;outline:none;padding:16px 20px;font-family:'DM Mono',monospace;font-size:.88rem;color:var(--text)}
+    .einput::placeholder{color:var(--muted)}
+    .esubmit{background:var(--accent);color:#050810;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;border:none;padding:16px 24px;cursor:pointer}
+    .consent-label{display:flex;align-items:flex-start;gap:10px;margin-top:16px;text-align:left;font-size:.78rem;color:var(--muted);line-height:1.5}
+    .consent-label input{margin-top:3px}
+    .consent-label a{color:var(--accent)}
+    .epromise{margin-top:14px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)}
+    .esuccess{margin-top:16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent);display:none}
+    .eerror{margin-top:16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--danger);display:none}
+    @media(max-width:768px){.hero{grid-template-columns:1fr;padding:100px 20px 60px}.hero-card{display:none}.section{padding:60px 20px}.chead,.crow{grid-template-columns:2fr 1fr 1fr}.chead>*:nth-child(n+4),.crow>*:nth-child(n+4){display:none}.fgrid{grid-template-columns:1fr}.esec{padding:60px 20px}.eform{flex-direction:column}}
+  </style>
+
+  <script>
+    // Subscribe form handler — calls our secure Worker
+    document.getElementById('subscribe-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const consent = (document.getElementById('consent-check') as HTMLInputElement)?.checked;
+      const errorEl = document.getElementById('subscribe-error') as HTMLElement;
+      const successEl = document.getElementById('subscribe-success') as HTMLElement;
+
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      if (!consent) {
+        errorEl.textContent = 'Please confirm consent to subscribe.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const formData = new FormData(form);
+      const email = formData.get('email') as string;
+      const honeypot = formData.get('website') as string;
+
+      // Honeypot check — bot detection
+      if (honeypot) return;
+
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            source: 'homepage_hero',
+            consent_copy: 'I agree to receive the weekly Rate Bible newsletter and understand I can unsubscribe at any time.',
+            consent_timestamp: new Date().toISOString(),
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          form.style.display = 'none';
+          successEl.style.display = 'block';
+        } else {
+          errorEl.textContent = data.error || 'Subscription failed. Please try again.';
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        errorEl.textContent = 'Connection error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Affiliate click tracking — fire and forget to Worker
+    document.querySelectorAll('.cbtn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const slug = target.dataset.provider;
+        const corridor = target.dataset.corridor;
+        const asset = target.dataset.asset;
+        if (!slug) return;
+
+        // Track click (no-PII)
+        fetch('/api/affiliate-click', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider_slug: slug, corridor, asset }),
+        }).catch(() => {});
+
+        // Open affiliate link in new tab
+        const sid = Math.random().toString(36).substring(2, 11);
+        window.open(`/api/redirect?p=${slug}&c=${corridor}&a=${asset}&s=${sid}`, '_blank', 'noopener,noreferrer');
+      });
+    });
+  </script>
+</BaseLayout>

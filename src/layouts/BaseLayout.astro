@@ -1,0 +1,194 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  jsonLd?: object;
+  publishedTime?: string;
+  modifiedTime?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage = 'https://sendcrypto.io/og-image.png',
+  ogType = 'website',
+  jsonLd,
+  publishedTime,
+  modifiedTime,
+  noindex = false,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const canonicalUrl = canonical || `https://sendcrypto.io${pathname}`;
+
+// Set strict security headers on every response
+Astro.response.headers.set('X-Content-Type-Options', 'nosniff');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+Astro.response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+Astro.response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+Astro.response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+Astro.response.headers.set(
+  'Content-Security-Policy',
+  [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: https:",
+    "connect-src 'self' https://*.supabase.co https://*.workers.dev",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "upgrade-insecure-requests",
+  ].join('; ')
+);
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {noindex
+    ? <meta name="robots" content="noindex, nofollow" />
+    : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  }
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content={ogType} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content="SendCrypto.io" />
+  <meta property="og:locale" content="en_US" />
+  {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+  {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://kbilecibimkkouenojpj.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- JSON-LD Structured Data -->
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+  <!-- Global JSON-LD: Organization -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SendCrypto.io",
+    "url": "https://sendcrypto.io",
+    "logo": "https://sendcrypto.io/og-image.png",
+    "description": "Cryptocurrency to fiat currency rate comparison platform for licensed remittance providers.",
+    "sameAs": []
+  })} />
+
+  <style is:global>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#050810;--bg2:#080c18;--surface:#0d1225;
+      --border:rgba(255,255,255,0.07);--accent:#00ff88;
+      --text:#f0f4ff;--muted:#6b7a99;--card:rgba(255,255,255,0.03);
+      --danger:#ff4d6d;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.7}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Cookie Banner */
+    #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:rgba(5,8,16,0.98);border-top:1px solid var(--accent);padding:24px 40px;z-index:9999;backdrop-filter:blur(16px);display:none}
+    #cookie-banner.show{display:block}
+    #cookie-banner .cb-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    #cookie-banner h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+    #cookie-banner p{font-size:.85rem;color:var(--muted);max-width:600px;line-height:1.6}
+    #cookie-banner .cb-actions{display:flex;gap:10px;flex-wrap:wrap}
+    #cookie-banner button{padding:10px 20px;border-radius:4px;font-family:'Syne',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;border:none;transition:all .2s}
+    .cb-accept{background:var(--accent);color:#050810}
+    .cb-reject{background:transparent;color:var(--text);border:1px solid var(--border)!important}
+    .cb-customize{background:transparent;color:var(--muted);border:1px solid var(--border)!important;font-size:.75rem!important}
+    @media(max-width:768px){#cookie-banner{padding:16px 20px}#cookie-banner .cb-inner{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <slot name="nav" />
+  <slot />
+  <slot name="footer" />
+
+  <!-- Cookie Consent Banner (GDPR/CCPA compliant) -->
+  <div id="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc">
+    <div class="cb-inner">
+      <div>
+        <h3 id="cookie-title">Privacy &amp; Cookie Preferences</h3>
+        <p id="cookie-desc">We use essential cookies for site functionality. With your consent, we use analytics cookies to improve the platform. We never sell your data. Read our <a href="/privacy/">Privacy Policy</a> and <a href="/cookies/">Cookie Policy</a>.</p>
+      </div>
+      <div class="cb-actions">
+        <button class="cb-reject" onclick="window.SC_cookies('reject')">Reject All</button>
+        <button class="cb-customize" onclick="window.location.href='/cookies/'">Customize</button>
+        <button class="cb-accept" onclick="window.SC_cookies('accept')">Accept All</button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    // Cookie consent — stored in localStorage (no cookie needed to track this)
+    (function() {
+      const KEY = 'sc_consent_v1';
+      const consent = localStorage.getItem(KEY);
+
+      window.SC_cookies = function(action) {
+        const data = {
+          status: action,
+          timestamp: new Date().toISOString(),
+          version: 1,
+        };
+        localStorage.setItem(KEY, JSON.stringify(data));
+        document.getElementById('cookie-banner').classList.remove('show');
+        if (action === 'accept') {
+          // Initialize analytics here when user accepts
+          window.SC_analytics_enabled = true;
+        }
+      };
+
+      window.SC_getConsent = function() {
+        try {
+          return JSON.parse(localStorage.getItem(KEY) || 'null');
+        } catch { return null; }
+      };
+
+      // Show banner if no consent stored OR consent older than 12 months
+      if (!consent) {
+        setTimeout(() => document.getElementById('cookie-banner').classList.add('show'), 1500);
+      } else {
+        try {
+          const data = JSON.parse(consent);
+          const age = Date.now() - new Date(data.timestamp).getTime();
+          if (age > 365 * 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(KEY);
+            setTimeout(() => document.getElementById('cookie-banner').classList.add('show'), 1500);
+          } else if (data.status === 'accept') {
+            window.SC_analytics_enabled = true;
+          }
+        } catch {}
+      }
+    })();
+  </script>
+</body>
+</html>

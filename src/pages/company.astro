@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About SendCrypto.io",
+  "url": "https://sendcrypto.io/company/",
+};
+---
+<BaseLayout
+  title="Company — SendCrypto.io | Independent Crypto-to-Fiat Comparison Platform"
+  description="SendCrypto.io is an independent crypto-to-fiat rate comparison platform. No bank. No license. No bias. Just the best rates across licensed providers."
+  jsonLd={jsonLd}
+>
+  <Nav slot="nav" active="company" />
+
+  <main>
+    <div class="ph">
+      <div class="ptag">// about us</div>
+      <h1 class="ptitle">We Built the Tool<br /><span>We Wished Existed.</span></h1>
+      <p class="psub">SendCrypto.io is an independent comparison platform. We don't hold your money. We don't have a license to protect. We have one job: show you the best rate, every time, with full fee transparency.</p>
+    </div>
+
+    <div class="mblock">
+      <div class="mtext">"The crypto remittance market moves <em>$600 billion</em> annually — and most senders have no idea they're leaving 2–4% on the table. We fix that."</div>
+    </div>
+
+    <div class="stats">
+      <div class="sc"><div class="sv">10+</div><div class="sl">Platforms tracked</div></div>
+      <div class="sc"><div class="sv">40+</div><div class="sl">Active corridors</div></div>
+      <div class="sc"><div class="sv">15m</div><div class="sl">Rate refresh cycle</div></div>
+      <div class="sc"><div class="sv">$0</div><div class="sl">Cost to compare</div></div>
+    </div>
+
+    <div class="content">
+      <div class="two-col">
+        <div>
+          <h2>What We Are</h2>
+          <p>SendCrypto.io is a rate comparison and information platform for people converting cryptocurrency to fiat currency. We aggregate live rate data from licensed, regulated providers across more than 40 remittance corridors worldwide.</p>
+          <p>We are not a money transmitter. We do not hold, transfer, or settle funds. Every conversion happens directly on the platform you choose — a licensed, regulated provider we independently evaluate and rank.</p>
+          <p>Our revenue comes from affiliate commissions when users click through and complete transactions on partner platforms, and from display advertising. This is fully disclosed in our affiliate policy.</p>
+        </div>
+        <div>
+          <h2>What We Are Not</h2>
+          <p>We are not a bank. We are not a licensed money services business. We do not provide financial advice. Rate data on this platform is for comparison purposes only and is not a guarantee of pricing.</p>
+          <p>We are not paid by providers to rank them higher. Our algorithm ranks based on net rate received by the sender — the amount that hits the recipient's account after all fees. Best deal for the user ranks first.</p>
+          <p>We have no proprietary relationship with any single provider that influences our organic rankings. Sponsored placement is disclosed with a visible "Sponsored" label and does not alter the organic comparison.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar"><div class="pnum">// 01</div><div class="ptl">Independent Rankings</div><div class="pdesc">Our comparison algorithm ranks by net recipient amount. No platform can pay to rank #1 in organic results. Sponsored slots are clearly labeled and separated.</div></div>
+      <div class="pillar"><div class="pnum">// 02</div><div class="ptl">Licensed Providers Only</div><div class="pdesc">Every platform in our index holds a valid Money Transmitter License or equivalent regulation in its operating jurisdiction. Unlicensed platforms are excluded.</div></div>
+      <div class="pillar"><div class="pnum">// 03</div><div class="ptl">Full Fee Transparency</div><div class="pdesc">We show the exchange rate, the service fee, and the estimated delivery time. No hidden spreads. No buried charges. What you see is what the recipient gets.</div></div>
+    </div>
+
+    <div class="dbox">
+      <p>IMPORTANT DISCLOSURE: SendCrypto.io is a comparison and information platform, not a licensed financial services provider. We do not hold, transmit, or settle funds. Rate data is provided for informational purposes and is subject to change without notice. Always confirm the final rate and fees directly on the provider's platform before initiating a transfer. SendCrypto.io is not responsible for transactions executed on third-party platforms.</p>
+    </div>
+  </main>
+
+  <Footer slot="footer" />
+
+  <style>
+    main{position:relative;z-index:1;padding-top:90px;max-width:1200px;margin:0 auto}
+    .ph{padding:80px 40px 60px;border-bottom:1px solid var(--border)}
+    .ptag{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+    .ptitle{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.05}
+    .ptitle span{color:var(--accent)}
+    .psub{margin-top:20px;font-size:1.05rem;color:var(--muted);max-width:560px;line-height:1.75}
+    .mblock{margin:60px 40px;padding:48px 56px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:12px;position:relative;overflow:hidden}
+    .mtext{font-size:1.4rem;font-weight:700;line-height:1.5;letter-spacing:-.02em;max-width:700px}
+    .mtext em{color:var(--accent);font-style:normal}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:0}
+    .sc{padding:44px 40px;border-right:1px solid var(--border);text-align:center}
+    .sc:last-child{border-right:none}
+    .sv{font-size:2.5rem;font-weight:800;letter-spacing:-.04em;color:var(--accent);margin-bottom:6px}
+    .sl{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+    .content{padding:80px 40px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+    h2{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;margin-bottom:20px;line-height:1.2}
+    p{font-size:.92rem;color:var(--muted);line-height:1.8;margin-bottom:14px}
+    .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 40px 60px}
+    .pillar{padding:36px 32px;background:var(--card)}
+    .pnum{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.1em;margin-bottom:16px}
+    .ptl{font-size:1rem;font-weight:700;margin-bottom:10px}
+    .pdesc{font-size:.875rem;color:var(--muted);line-height:1.65}
+    .dbox{margin:60px 40px;padding:28px 36px;background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.15);border-radius:8px}
+    .dbox p{font-family:'DM Mono',monospace;font-size:.75rem;color:rgba(255,107,53,.85);line-height:1.75;margin:0}
+    @media(max-width:768px){.ph,.content{padding-left:20px;padding-right:20px}.two-col{grid-template-columns:1fr;gap:40px}.mblock,.dbox{margin:40px 20px;padding:32px 24px}.pillars{grid-template-columns:1fr;margin:0 20px 40px}.stats{grid-template-columns:1fr 1fr}}
+  </style>
+</BaseLayout>
