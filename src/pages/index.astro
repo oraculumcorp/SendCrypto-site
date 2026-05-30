@@ -10,7 +10,13 @@ const { data: prices } = await supabase.from('coingecko_prices').select('symbol,
 const safeRates = rates || [];
 const safePrices = prices || [];
 const maxRate = safeRates[0]?.rate || 0;
-const jsonLd = { "@context": "https://schema.org", "@type": "WebSite", "name": "SendCrypto.io", "url": "https://sendcrypto.io", "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms." };
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SendCrypto.io",
+  "url": "https://sendcrypto.io",
+  "description": "Compare real-time crypto-to-fiat exchange rates across 10+ licensed platforms.",
+};
 ---
 <BaseLayout title="SendCrypto.io — Send Crypto. Get Cash. Instantly." description="Compare real-time crypto-to-fiat rates across 10+ licensed platforms. Free. No account needed. Best rate, every time." jsonLd={jsonLd}>
   <Nav slot="nav" />
