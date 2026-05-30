@@ -29,7 +29,6 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
   const runtime = (locals as any).runtime;
   const env = runtime?.env ?? {};
-  console.log('ENV KEYS:', Object.keys(env));
 
   const supabaseUrl = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -148,8 +147,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
         }),
       });
       
-      const resendText = await resendRes.text();
-      console.log('Resend response:', resendRes.status, resendText);
+      
     }
 
     // Fire and forget audit log
