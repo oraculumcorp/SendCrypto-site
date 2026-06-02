@@ -1,15 +1,16 @@
 import type { APIContext } from 'astro';
 import { getC2CClient } from '../../lib/supabase';
-import { validateOrigin } from '../../lib/security';
+import { isAllowedOrigin } from '../../lib/security';
 
 export const prerender = false;
 
 export async function POST({ request, locals }: APIContext) {
-  if (!validateOrigin(request)) {
+  const env = (locals as any).runtime?.env ?? {};
+  const origin = request.headers.get('origin');
+  const allowed = env.ALLOWED_ORIGINS?.split(',') ?? ['https://crypto2cash.io'];
+  if (!isAllowedOrigin(origin, allowed)) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
   }
-
-  const env = (locals as any).runtime?.env ?? {};
 
   let body: any;
   try {
