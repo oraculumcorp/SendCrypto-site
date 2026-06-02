@@ -9,6 +9,6 @@ binding = "ASSETS"
 
 [vars]
 SITE_URL = "https://sendcrypto.io"
-ALLOWED_ORIGINS = "https://sendcrypto.io"
+ALLOWED_ORIGINS = "https://sendcrypto.io,https://crypto2cash.io"
 PUBLIC_SUPABASE_URL = "https://kbilecibimkkouenojpj.supabase.co"
 PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiaWxlY2liaW1ra291ZW5vanBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODQ0OTAsImV4cCI6MjA5MzA2MDQ5MH0.sDV6KM_ul6bTL--6uETWyBrSMyM3gJdccfYbuAftqFo"
