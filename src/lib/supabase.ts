@@ -33,6 +33,43 @@ export function getServiceClient(env: any) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
+// CRYPTO2CASH client — targets crypto2cash schema
+export function getC2CClient(env: any) {
+  const url = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
+  const key = env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error('Missing Supabase public credentials');
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    db: { schema: 'crypto2cash' },
+    global: { headers: { 'x-application-name': 'crypto2cash-web' } },
+  });
+}
+
+export interface BusinessLead {
+  id: string;
+  company: string;
+  email: string;
+  volume: string;
+  asset: string;
+  status: string;
+  created_at: string;
+}
+
+export interface ApiWaitlist {
+  id: string;
+  email: string;
+  company: string;
+  use_case: string;
+  created_at: string;
+}
+
+export interface LeadAssignment {
+  id: string;
+  lead_id: string;
+  provider_id: string;
+  assigned_at: string;
+  status: string;
+}
 
 // Type definitions for blog_posts table
 export interface BlogPost {
