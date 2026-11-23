@@ -146,14 +146,16 @@ const fmt=(n,c)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',c
 const spd=m=>m<=1?'Instant':m<60?`~${m} min`:`~${Math.round(m/60)} h`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const FRESH=36e5;
+const LIVE=2*36e5; // a quote older than 2h is not "live"
+let curT=0;
 function ago(t){const s=(Date.now()-t)/1e3;return s<90?'just now':s<3600?Math.round(s/60)+'m ago':s<172800?Math.round(s/3600)+'h ago':Math.round(s/86400)+'d ago'}
+const dstr=t=>t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'an unknown date';
 function status(ok){
-  const fresh=data&&data.t&&Date.now()-data.t<FRESH;
+  const t=curT||(data&&data.t)||0,fresh=t&&Date.now()-t<LIVE;
   $('dot').className=!ok?'dot off':fresh?'dot':'dot old';
-  $('upd').textContent=!data?(ok?'Connecting':'Offline'):!ok?'Offline · '+(data.t?ago(data.t):''):fresh?'Live · '+ago(data.t):'Updated '+(data.t?ago(data.t):'—');
-  const w=$('stale');if(data&&!fresh){w.hidden=false;w.textContent='Rates last updated '+(data.t?new Date(data.t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'at an unknown time')+'. Treat as indicative only and confirm the live quote with the provider.'}else w.hidden=true;
+  $('upd').textContent=!data?(ok?'Connecting':'Offline'):!ok?'Offline · '+(t?ago(t):''):fresh?'Live · '+ago(t):'Updated '+(t?ago(t):'—');
 }
+function warn(m){const w=$('stale');w.hidden=!m;w.textContent=m||''}
 
 function fillPairs(){
   const keys=Object.keys(data.pairs).sort((a,b)=>label(a).localeCompare(label(b)));
@@ -171,24 +173,31 @@ function render(){
   if(!rows.length||!amt){list.innerHTML=`<li class="empty">${amt?'No providers on this route yet.':'Enter an amount to compare.'}</li>`;$('sum').hidden=true;return}
   // Provider limits are USD-denominated; only enforce them for USD stablecoins.
   const usd=/^(USDT|USDC|DAI|PYUSD|FDUSD)$/.test(asset);
-  rows.forEach(r=>{r.ok=!usd||(!(r.lo&&amt<r.lo)&&!(r.hi&&amt>r.hi));r.get=Math.max(0,(amt-(r.ff||0))*r.r*(1-r.f/100))});
-  const avail=rows.filter(r=>r.ok);
-  if(!avail.length){$('sum').hidden=true;list.innerHTML=`<li class="empty">No provider accepts ${amt} ${asset} on this route. Limits: ${rows.map(r=>esc(r.n)+' '+(r.lo||0)+'–'+(r.hi||'∞')).join(', ')}.</li>`;return}
-  const byPay=avail.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
+  rows.forEach(r=>{r.lim=usd&&!!((r.lo&&amt<r.lo)||(r.hi&&amt>r.hi));r.old=!r.t||Date.now()-r.t>LIVE;r.get=Math.max(0,(amt-(r.ff||0))*r.r*(1-r.f/100))});
+  const okRows=rows.filter(r=>!r.lim);
+  if(!okRows.length){curT=0;warn('');$('sum').hidden=true;list.innerHTML=`<li class="empty">No provider accepts ${amt} ${esc(asset)} on this route. Limits: ${rows.map(r=>esc(r.n)+' '+(r.lo||0)+'–'+(r.hi||'∞')).join(', ')}.</li>`;return}
+  // Rank only live quotes; fall back to all (with a warning) when none are live.
+  const live=okRows.filter(r=>!r.old),pool=live.length?live:okRows;
+  rows.forEach(r=>r.rank=pool.includes(r));
+  curT=Math.max(...pool.map(r=>r.t||0));
+  const byPay=pool.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
   const cmp=sort==='fast'?(a,b)=>a.m-b.m||b.get-a.get:sort==='fee'?(a,b)=>a.f-b.f||b.get-a.get:(a,b)=>b.get-a.get;
-  rows.sort((a,b)=>(b.ok-a.ok)||cmp(a,b));
+  rows.sort((a,b)=>(b.rank-a.rank)||(a.lim-b.lim)||cmp(a,b));
   $('sum').hidden=false;status(navigator.onLine);
+  const nl=okRows.length-live.length;
+  warn(!live.length?`No live quotes on this route. Rates last updated ${dstr(curT)} — indicative only; confirm with the provider.`:nl?`${nl} provider${nl>1?'s':''} on this route ${nl>1?'have':'has'} no live quote and ${nl>1?'are':'is'} not ranked.`:'');
   $('best').textContent=fmt(top.get,fiat);
   const gap=top.get-low.get;
-  $('save').textContent=avail.length>1&&gap>0?`with ${top.n} — ${fmt(gap,fiat)} more than the lowest of ${avail.length} providers`:`with ${top.n}`;
+  $('save').textContent=pool.length>1&&gap>0?`with ${top.n} — ${fmt(gap,fiat)} more than the lowest of ${pool.length} ${live.length?'live ':''}quotes`:`with ${top.n}`;
   list.innerHTML=rows.map(r=>{
-    const best=r===top,d=top.get-r.get;
-    if(!r.ok)return `<li class="r na"><div class="n">${esc(r.n)}</div><div class="row2"><span class="meta">${r.lo&&amt<r.lo?'Minimum '+r.lo:'Maximum '+r.hi} ${esc(asset)}</span></div></li>`;
+    const best=r===top,d=top.get-r.get,rate=r.r.toLocaleString(undefined,{maximumFractionDigits:4});
+    if(r.lim)return `<li class="r na"><div class="n">${esc(r.n)}</div><div class="row2"><span class="meta">${r.lo&&amt<r.lo?'Minimum '+r.lo:'Maximum '+r.hi} ${esc(asset)}</span></div></li>`;
+    if(!r.rank)return `<li class="r na"><div class="n">${esc(r.n)}</div><div class="go">${r.s?`<button class="btn" data-s="${esc(r.s)}">Check</button>`:''}</div><div class="row2"><span class="meta">Not live · last quote ${dstr(r.t)}: ${rate}</span></div></li>`;
     return `<li class="r${best?' best':''}">
       <div class="n">${best?'<span class="tag">BEST</span>':''}${esc(r.n)}</div>
       <div class="go">${r.s?`<button class="btn pri" data-s="${esc(r.s)}">Go</button>`:''}</div>
       <div class="row2"><span class="get">${fmt(r.get,fiat)}</span></div>
-      <div class="row2"><span class="meta">${r.r.toLocaleString(undefined,{maximumFractionDigits:4})} · ${r.f}% fee · ${spd(r.m)}</span>${!best&&d>0?`<span class="diff">−${fmt(d,fiat)}</span>`:''}</div>
+      <div class="row2"><span class="meta">${rate} · ${r.f}% fee · ${spd(r.m)}</span>${!best&&d>0?`<span class="diff">−${fmt(d,fiat)}</span>`:''}</div>
     </li>`}).join('');
 }
 
