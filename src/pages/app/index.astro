@@ -157,6 +157,7 @@ function render(){
   const k=pairEl.value,rows=(data.pairs[k]||[]).slice(),amt=num(amtEl.value),[,asset,fiat]=k.split(':');
   $('as').textContent=asset||'';
   prefs={pair:k,amt:amtEl.value};try{LS.setItem(P,JSON.stringify(prefs))}catch(e){}
+  try{history.replaceState(null,'',`?pair=${encodeURIComponent(k)}&amt=${encodeURIComponent(amtEl.value)}`)}catch(e){}
   if(!rows.length||!amt){list.innerHTML=`<li class="empty">${amt?'No providers on this route yet.':'Enter an amount to compare.'}</li>`;$('sum').hidden=true;return}
   rows.forEach(r=>r.get=amt*r.r*(1-r.f/100));
   const byPay=rows.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
