@@ -1,0 +1,219 @@
+---
+// SendCrypto Lite — installable PWA. Static shell, data from /api/rates.
+// Zero dependencies, system fonts, inline CSS/JS: one request for the shell, one for data.
+export const prerender = true;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>SendCrypto App — Best crypto-to-cash rate in one tap</title>
+<meta name="description" content="Free, installable app to compare live crypto-to-fiat payout across licensed platforms. Enter an amount, see who pays the most." />
+<link rel="canonical" href="https://sendcrypto.io/app/" />
+<meta name="theme-color" content="#0A0812" />
+<meta name="color-scheme" content="dark" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" type="image/png" href="/app/icon-192.png" />
+<link rel="apple-touch-icon" href="/app/icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SendCrypto" />
+<meta property="og:title" content="SendCrypto App — Best crypto-to-cash rate in one tap" />
+<meta property="og:description" content="Enter an amount, see which licensed platform pays out the most. Free, no account." />
+<meta property="og:url" content="https://sendcrypto.io/app/" />
+<meta property="og:image" content="https://sendcrypto.io/og-image.png" />
+<style is:inline>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#F5C842;--g2:#FFB347;--bg:#0A0812;--s:rgba(255,255,255,.05);--s2:rgba(255,255,255,.09);--b:rgba(255,255,255,.09);--t:#F8F5FF;--m:rgba(248,245,255,.55);--d:rgba(248,245,255,.32);--ok:#3DFFC0;--bad:#FF5C7A;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+html,body{background:var(--bg);color:var(--t);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(120% 60% at 50% -10%,rgba(124,92,252,.18),transparent 60%),var(--bg)}
+.w{max-width:520px;margin:0 auto;padding:16px 16px 32px}
+header{display:flex;align-items:center;justify-content:space-between;padding:6px 0 18px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;color:var(--t);text-decoration:none}
+.logo b{color:var(--g)}
+.hb{display:flex;gap:8px;align-items:center}
+.live{font:500 11px var(--mono);color:var(--m);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.off{background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.btn{border:1px solid var(--b);background:var(--s);color:var(--t);border-radius:10px;padding:8px 12px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,var(--g),var(--g2));color:#0A0812;border:0}
+[hidden]{display:none!important}
+.card{background:var(--s);border:1px solid var(--b);border-radius:18px;padding:16px}
+label.l{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--d);margin-bottom:6px}
+.amt{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b);padding-bottom:12px;margin-bottom:14px}
+.amt input{flex:1;min-width:0;background:none;border:0;color:var(--t);font:700 34px var(--mono);outline:none}
+.amt span{font:700 15px var(--mono);color:var(--g)}
+select{width:100%;appearance:none;background:var(--s2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F5C842' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid var(--b);border-radius:12px;color:var(--t);font:600 15px inherit;font-family:inherit;padding:12px 36px 12px 12px;outline:none}
+select:focus,.amt input:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+.sum{margin:16px 0 10px;padding:16px;border-radius:18px;background:linear-gradient(135deg,rgba(245,200,66,.14),rgba(124,92,252,.1));border:1px solid rgba(245,200,66,.25)}
+.sum .k{font-size:12px;color:var(--m)}
+.sum .v{font:800 30px var(--mono);color:var(--g);margin:2px 0;word-break:break-all}
+.sum .x{font-size:13px;color:var(--ok)}
+.tabs{display:flex;gap:6px;margin:14px 0 10px}
+.tabs button{flex:1;border:1px solid var(--b);background:none;color:var(--m);border-radius:10px;padding:8px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--s2);color:var(--t);border-color:rgba(245,200,66,.35)}
+ol{list-style:none;display:grid;gap:8px}
+li.r{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;background:var(--s);border:1px solid var(--b);border-radius:14px;padding:12px 14px}
+li.r.best{border-color:rgba(245,200,66,.45);background:rgba(245,200,66,.07)}
+.n{font-weight:700;display:flex;gap:6px;align-items:center}
+.tag{font:700 10px var(--mono);background:var(--g);color:#0A0812;border-radius:5px;padding:2px 5px}
+.get{font:700 16px var(--mono);text-align:right}
+.meta{font:12px var(--mono);color:var(--d)}
+.go{grid-row:span 2;grid-column:2}
+.row2{display:flex;justify-content:space-between;gap:8px;grid-column:1/-1}
+.diff{font:12px var(--mono);color:var(--bad)}
+.empty{text-align:center;color:var(--m);padding:28px 8px}
+.alert{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:14px}
+.alert p{font-size:13px;color:var(--m)}
+.alert a{white-space:nowrap;text-decoration:none}
+footer{margin-top:22px;font-size:11.5px;color:var(--d);line-height:1.55}
+footer a{color:var(--m)}
+.ios{margin-top:12px;font-size:13px;color:var(--m);background:var(--s);border:1px dashed var(--b);border-radius:12px;padding:10px 12px}
+@media(prefers-reduced-motion:no-preference){li.r{animation:in .25s ease both}@keyframes in{from{opacity:0;transform:translateY(4px)}}}
+</style>
+</head>
+<body>
+<div class="w">
+  <header>
+    <a class="logo" href="/" aria-label="SendCrypto.io home">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6.5" stroke="#F5C842" stroke-width="1.8"/><path d="M9 20C9 20 9 16.5 16 16.5C23 16.5 23 13 16 13C9 13 9 16.5 16 16.5C23 16.5 23 20 16 20" stroke="#F5C842" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Send<b>Crypto</b></span>
+    </a>
+    <div class="hb">
+      <span class="live" id="st"><span class="dot" id="dot"></span><span id="upd">…</span></span>
+      <button class="btn pri" id="inst" hidden>Install</button>
+      <button class="btn" id="shr" aria-label="Share this comparison">Share</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-label="Your transfer">
+      <label class="l" for="amt">You send</label>
+      <div class="amt"><input id="amt" type="text" inputmode="decimal" autocomplete="off" value="500" aria-describedby="as" /><span id="as">USDT</span></div>
+      <label class="l" for="pair">Route</label>
+      <select id="pair" aria-label="Corridor and currency"><option>Loading routes…</option></select>
+    </section>
+
+    <section class="sum" id="sum" aria-live="polite" hidden>
+      <div class="k">Best estimated payout</div>
+      <div class="v" id="best">—</div>
+      <div class="x" id="save"></div>
+    </section>
+
+    <div class="tabs" role="group" aria-label="Sort by">
+      <button aria-pressed="true" data-sort="pay">Most cash</button>
+      <button aria-pressed="false" data-sort="fast">Fastest</button>
+      <button aria-pressed="false" data-sort="fee">Lowest fee</button>
+    </div>
+
+    <ol id="list" aria-label="Providers"><li class="empty">Loading live rates…</li></ol>
+
+    <div class="card alert">
+      <p>Get the best rate for your route in your inbox weekly.</p>
+      <a class="btn" href="/#rates">Free alerts</a>
+    </div>
+    <div class="ios" id="ios" hidden>Install on iPhone: tap <b>Share</b> → <b>Add to Home Screen</b>.</div>
+  </main>
+
+  <footer>
+    <p><b>Affiliate disclosure:</b> SendCrypto.io may earn a commission when you use a provider through this app. It never changes the ranking — providers are sorted only by the numbers shown.</p>
+    <p style="margin-top:8px">Payouts are estimates (amount × rate − listed fee) from data refreshed about every 15 minutes. Network fees, spreads, limits and KYC may apply. Always confirm the final quote with the provider. Not financial advice. Availability varies by country.</p>
+    <p style="margin-top:8px"><a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a> · <a href="/">sendcrypto.io</a></p>
+  </footer>
+</div>
+
+<script is:inline>
+(()=>{
+const $=id=>document.getElementById(id),LS=localStorage,K='sc_rates',P='sc_prefs';
+const amtEl=$('amt'),pairEl=$('pair'),list=$('list');
+let data=null,sort='pay';
+const q=new URLSearchParams(location.search);
+let prefs={};try{prefs=JSON.parse(LS.getItem(P)||'{}')}catch(e){}
+if(q.get('amt'))amtEl.value=q.get('amt');else if(prefs.amt)amtEl.value=prefs.amt;
+const want=(q.get('pair')||prefs.pair||'US-MX:USDT:MXN').toUpperCase();
+
+const CC={MX:'Mexico',NG:'Nigeria',PH:'Philippines',BR:'Brazil',KE:'Kenya',US:'US',IN:'India',GH:'Ghana',CO:'Colombia',AR:'Argentina',PE:'Peru',VN:'Vietnam',ID:'Indonesia',PK:'Pakistan',ZA:'South Africa',GB:'UK',EU:'Europe',CA:'Canada',TR:'Türkiye',EG:'Egypt',SV:'El Salvador',GT:'Guatemala',DO:'Dominican Rep.',HN:'Honduras',CL:'Chile',UG:'Uganda',TZ:'Tanzania',BD:'Bangladesh'};
+const label=k=>{const[c,a,f]=k.split(':'),[o,d]=c.split('-');return `${CC[o]||o} → ${CC[d]||d} · ${a}/${f}`};
+const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return isFinite(n)&&n>0?n:0};
+const fmt=(n,c)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency:c,maximumFractionDigits:n>=10?0:2}).format(n)}catch(e){return n.toFixed(2)+' '+c}};
+const spd=m=>m<=1?'Instant':m<60?`~${m} min`:`~${Math.round(m/60)} h`;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function ago(t){const s=(Date.now()-t)/1e3;return s<90?'just now':s<3600?Math.round(s/60)+'m ago':Math.round(s/3600)+'h ago'}
+function status(ok){$('dot').className=ok?'dot':'dot off';$('upd').textContent=data?(ok?'Live · ':'Offline · ')+ago(data.t):(ok?'Live':'Offline')}
+
+function fillPairs(){
+  const keys=Object.keys(data.pairs).sort((a,b)=>label(a).localeCompare(label(b)));
+  if(!keys.length){pairEl.innerHTML='<option>No routes available</option>';return}
+  pairEl.innerHTML=keys.map(k=>`<option value="${esc(k)}">${esc(label(k))}</option>`).join('');
+  pairEl.value=keys.includes(want)?want:(keys.includes(pairEl.dataset.v)?pairEl.dataset.v:keys[0]);
+}
+
+function render(){
+  if(!data)return;
+  const k=pairEl.value,rows=(data.pairs[k]||[]).slice(),amt=num(amtEl.value),[,asset,fiat]=k.split(':');
+  $('as').textContent=asset||'';
+  prefs={pair:k,amt:amtEl.value};try{LS.setItem(P,JSON.stringify(prefs))}catch(e){}
+  if(!rows.length||!amt){list.innerHTML=`<li class="empty">${amt?'No providers on this route yet.':'Enter an amount to compare.'}</li>`;$('sum').hidden=true;return}
+  rows.forEach(r=>r.get=amt*r.r*(1-r.f/100));
+  const byPay=rows.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
+  rows.sort(sort==='fast'?(a,b)=>a.m-b.m||b.get-a.get:sort==='fee'?(a,b)=>a.f-b.f||b.get-a.get:(a,b)=>b.get-a.get);
+  $('sum').hidden=false;
+  $('best').textContent=fmt(top.get,fiat);
+  const gap=top.get-low.get;
+  $('save').textContent=rows.length>1&&gap>0?`with ${top.n} — ${fmt(gap,fiat)} more than the lowest of ${rows.length} providers`:`with ${top.n}`;
+  list.innerHTML=rows.map(r=>{
+    const best=r===top,d=top.get-r.get;
+    return `<li class="r${best?' best':''}">
+      <div class="n">${best?'<span class="tag">BEST</span>':''}${esc(r.n)}</div>
+      <div class="go">${r.s?`<button class="btn pri" data-s="${esc(r.s)}">Go</button>`:''}</div>
+      <div class="row2"><span class="get">${fmt(r.get,fiat)}</span></div>
+      <div class="row2"><span class="meta">${r.r.toLocaleString(undefined,{maximumFractionDigits:4})} · ${r.f}% fee · ${spd(r.m)}</span>${!best&&d>0?`<span class="diff">−${fmt(d,fiat)}</span>`:''}</div>
+    </li>`}).join('');
+}
+
+async function load(){
+  try{const c=JSON.parse(LS.getItem(K)||'null');if(c&&c.pairs){data=c;fillPairs();render();status(false)}}catch(e){}
+  try{
+    const r=await fetch('/api/rates',{headers:{accept:'application/json'}});
+    if(!r.ok)throw 0;
+    const j=await r.json();if(!j.pairs)throw 0;
+    pairEl.dataset.v=pairEl.value;data=j;fillPairs();render();status(true);
+    try{LS.setItem(K,JSON.stringify(j))}catch(e){}
+  }catch(e){status(false);if(!data)list.innerHTML='<li class="empty">Can’t reach live rates. Check your connection and try again.</li>'}
+}
+
+amtEl.addEventListener('input',render);
+pairEl.addEventListener('change',render);
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  sort=b.dataset.sort;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()}));
+list.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-s]');if(!b)return;
+  const s=b.dataset.s,[c,a]=pairEl.value.split(':');
+  fetch('/api/affiliate-click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider_slug:s,corridor:c,asset:a,source:'app'}),keepalive:true}).catch(()=>{});
+  window.open(`/api/redirect?p=${encodeURIComponent(s)}&c=${encodeURIComponent(c)}&a=${encodeURIComponent(a)}`,'_blank','noopener,noreferrer');
+});
+$('shr').addEventListener('click',async()=>{
+  const u=`${location.origin}/app/?pair=${encodeURIComponent(pairEl.value)}&amt=${encodeURIComponent(num(amtEl.value))}`;
+  const t=`Best payout for ${num(amtEl.value)} ${pairEl.value.split(':')[1]}: ${$('best').textContent}`;
+  try{if(navigator.share)await navigator.share({title:'SendCrypto',text:t,url:u});else{await navigator.clipboard.writeText(u);$('shr').textContent='Copied'}}catch(e){}
+});
+
+let ev=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;$('inst').hidden=false});
+$('inst').addEventListener('click',async()=>{if(!ev)return;ev.prompt();await ev.userChoice;ev=null;$('inst').hidden=true});
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!standalone)$('ios').hidden=false;
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/app/sw.js',{scope:'/app/'}).catch(()=>{}));
+addEventListener('online',load);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&data&&Date.now()-data.t>3e5)load()});
+setInterval(()=>data&&status(navigator.onLine),3e4);
+load();
+})();
+</script>
+</body>
+</html>
