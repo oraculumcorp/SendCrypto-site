@@ -7,8 +7,8 @@ export const GET: APIRoute = async ({ url, locals }) => {
   const env = (locals as any).runtime?.env || import.meta.env;
   const provider = url.searchParams.get('p');
 
-  if (!provider || !/^[a-z0-9-]+$/.test(provider)) {
-    return Astro.redirect ? Astro.redirect('/') : new Response(null, {
+  if (!provider || !/^[a-z0-9_-]+$/.test(provider)) {
+    return new Response(null, {
       status: 302,
       headers: { Location: 'https://sendcrypto.io/' },
     });

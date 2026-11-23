@@ -37,6 +37,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 .live{font:500 11px var(--mono);color:var(--m);display:flex;align-items:center;gap:6px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .dot.off{background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.dot.old{background:var(--g);box-shadow:0 0 8px var(--g)}
+.warn{margin-top:10px;font-size:12.5px;color:var(--g);background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.3);border-radius:10px;padding:8px 10px}
+li.r.na{opacity:.45}
 .btn{border:1px solid var(--b);background:var(--s);color:var(--t);border-radius:10px;padding:8px 12px;font:600 13px inherit;font-family:inherit;cursor:pointer}
 .btn:active{transform:scale(.97)}
 .btn.pri{background:linear-gradient(135deg,var(--g),var(--g2));color:#0A0812;border:0}
@@ -101,6 +104,7 @@ footer a{color:var(--m)}
       <div class="k">Best estimated payout</div>
       <div class="v" id="best">—</div>
       <div class="x" id="save"></div>
+      <div class="warn" id="stale" hidden></div>
     </section>
 
     <div class="tabs" role="group" aria-label="Sort by">
@@ -142,8 +146,14 @@ const fmt=(n,c)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',c
 const spd=m=>m<=1?'Instant':m<60?`~${m} min`:`~${Math.round(m/60)} h`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-function ago(t){const s=(Date.now()-t)/1e3;return s<90?'just now':s<3600?Math.round(s/60)+'m ago':Math.round(s/3600)+'h ago'}
-function status(ok){$('dot').className=ok?'dot':'dot off';$('upd').textContent=data?(ok?'Live · ':'Offline · ')+ago(data.t):(ok?'Live':'Offline')}
+const FRESH=36e5;
+function ago(t){const s=(Date.now()-t)/1e3;return s<90?'just now':s<3600?Math.round(s/60)+'m ago':s<172800?Math.round(s/3600)+'h ago':Math.round(s/86400)+'d ago'}
+function status(ok){
+  const fresh=data&&data.t&&Date.now()-data.t<FRESH;
+  $('dot').className=!ok?'dot off':fresh?'dot':'dot old';
+  $('upd').textContent=!data?(ok?'Connecting':'Offline'):!ok?'Offline · '+(data.t?ago(data.t):''):fresh?'Live · '+ago(data.t):'Updated '+(data.t?ago(data.t):'—');
+  const w=$('stale');if(data&&!fresh){w.hidden=false;w.textContent='Rates last updated '+(data.t?new Date(data.t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'at an unknown time')+'. Treat as indicative only and confirm the live quote with the provider.'}else w.hidden=true;
+}
 
 function fillPairs(){
   const keys=Object.keys(data.pairs).sort((a,b)=>label(a).localeCompare(label(b)));
@@ -159,15 +169,21 @@ function render(){
   prefs={pair:k,amt:amtEl.value};try{LS.setItem(P,JSON.stringify(prefs))}catch(e){}
   try{history.replaceState(null,'',`?pair=${encodeURIComponent(k)}&amt=${encodeURIComponent(amtEl.value)}`)}catch(e){}
   if(!rows.length||!amt){list.innerHTML=`<li class="empty">${amt?'No providers on this route yet.':'Enter an amount to compare.'}</li>`;$('sum').hidden=true;return}
-  rows.forEach(r=>r.get=amt*r.r*(1-r.f/100));
-  const byPay=rows.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
-  rows.sort(sort==='fast'?(a,b)=>a.m-b.m||b.get-a.get:sort==='fee'?(a,b)=>a.f-b.f||b.get-a.get:(a,b)=>b.get-a.get);
-  $('sum').hidden=false;
+  // Provider limits are USD-denominated; only enforce them for USD stablecoins.
+  const usd=/^(USDT|USDC|DAI|PYUSD|FDUSD)$/.test(asset);
+  rows.forEach(r=>{r.ok=!usd||(!(r.lo&&amt<r.lo)&&!(r.hi&&amt>r.hi));r.get=Math.max(0,(amt-(r.ff||0))*r.r*(1-r.f/100))});
+  const avail=rows.filter(r=>r.ok);
+  if(!avail.length){$('sum').hidden=true;list.innerHTML=`<li class="empty">No provider accepts ${amt} ${asset} on this route. Limits: ${rows.map(r=>esc(r.n)+' '+(r.lo||0)+'–'+(r.hi||'∞')).join(', ')}.</li>`;return}
+  const byPay=avail.slice().sort((a,b)=>b.get-a.get),top=byPay[0],low=byPay[byPay.length-1];
+  const cmp=sort==='fast'?(a,b)=>a.m-b.m||b.get-a.get:sort==='fee'?(a,b)=>a.f-b.f||b.get-a.get:(a,b)=>b.get-a.get;
+  rows.sort((a,b)=>(b.ok-a.ok)||cmp(a,b));
+  $('sum').hidden=false;status(navigator.onLine);
   $('best').textContent=fmt(top.get,fiat);
   const gap=top.get-low.get;
-  $('save').textContent=rows.length>1&&gap>0?`with ${top.n} — ${fmt(gap,fiat)} more than the lowest of ${rows.length} providers`:`with ${top.n}`;
+  $('save').textContent=avail.length>1&&gap>0?`with ${top.n} — ${fmt(gap,fiat)} more than the lowest of ${avail.length} providers`:`with ${top.n}`;
   list.innerHTML=rows.map(r=>{
     const best=r===top,d=top.get-r.get;
+    if(!r.ok)return `<li class="r na"><div class="n">${esc(r.n)}</div><div class="row2"><span class="meta">${r.lo&&amt<r.lo?'Minimum '+r.lo:'Maximum '+r.hi} ${esc(asset)}</span></div></li>`;
     return `<li class="r${best?' best':''}">
       <div class="n">${best?'<span class="tag">BEST</span>':''}${esc(r.n)}</div>
       <div class="go">${r.s?`<button class="btn pri" data-s="${esc(r.s)}">Go</button>`:''}</div>
